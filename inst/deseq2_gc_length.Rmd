@@ -1,0 +1,130 @@
+
+```{r, include=FALSE}
+
+comp <- toSortedTibble(deseq.result, ensembl) 
+comparisonFoldchange <- getComparisonFoldChange(deseq.result)
+tit <- getComparisonTitle(deseq.result)
+filterThreshold <- getFilterThreshold(deseq.result)
+if(SAVESIGNIF){
+  saveTables(comp, getComparisonString(deseq.result))
+}
+
+
+```
+
+# DESeq2 <br> `r tit`
+#### p.adj < `r pcut` |lFC| > `r lfc` 
+  
+  * `r getPosExplanation(getComparison(deseq.result))`
+  * `r getNegExplanation(getComparison(deseq.result))`
+  
+  
+## `r tit` just the table
+```{r, include=TRUE}
+  # knitr::kable( as.data.frame(extractMultiLFCSignif(deseq.result)))
+   knitr::kable(data.frame(a=c("A","B"),b=c("A","B")))
+```
+
+## `r tit` MA plot
+#### p.adj < `r pcut` |lFC| > `r lfc`
+
+```{r, include=TRUE}
+   plotMAPlot(comp, pcut, lfc, comparisonFoldchange)
+```
+
+## `r tit` Vulcano plot
+#### p.adj < `r pcut` |lFC| > `r lfc`
+
+```{r, include=TRUE}
+   plotVulcano(comp, pcut, lfc, comparisonFoldchange)
+```
+
+## `r tit` p-value distribution
+#### p.adj < `r pcut` |lFC| > `r lfc`
+```{r, include=TRUE}
+   plotPvalDist(comp, pcut)
+```
+
+## `r tit` independent filtering
+#### p.adj < `r pcut` |lFC| > `r lfc`
+```{r, include=TRUE}
+   plotIndependentFiltering(comp, pcut, filterThreshold)
+```
+
+
+## `r tit` length bias
+#### p.adj < `r pcut` |lFC| > `r lfc` 
+
+```{r, include=TRUE}
+ 
+   #ggplot(comp %>% dplyr::filter(padj < pcut), aes(x=padj,y=log2FoldChange, color=length_bin)) + geom_point() + facet_wrap(. ~ gene_biotype) + geom_hline(yintercept = 0, color="red")
+  
+   #ggplot(comp %>% dplyr::filter(padj < pcut, gene_biotype == "lincRNA"), aes(x=length_bin,y=log2FoldChange)) + geom_boxplot() + ggforce::geom_sina() + geom_hline(yintercept = 0, color="red")
+
+ #  byBioType <- ggplot(comp %>% dplyr::filter(padj < pcut), aes(x=gene_biotype,y=log2FoldChange)) + geom_boxplot() + geom_hline(yintercept = 0, color="red") + idoplots::xrot() + ylab(comparisonFoldchange)
+   ggplot(comp %>% dplyr::filter(padj < pcut , abs(log2FoldChange) > lfc), aes(x=length_bin,y=log2FoldChange))  + ggforce::geom_sina() + geom_boxplot(alpha=0,color="green") + geom_hline(yintercept = 0, color="red") + ylab(comparisonFoldchange)
+   
+```
+
+## `r tit` GC bias
+#### p.adj < `r pcut` |lFC| > `r lfc` 
+
+```{r, include=TRUE}
+   ggplot(comp %>% dplyr::filter(padj < pcut,  abs(log2FoldChange) > lfc), aes(x=gc_bin,y=log2FoldChange)) + ggforce::geom_sina()  + geom_boxplot(alpha=0,color="green") + geom_hline(yintercept = 0, color="red") + ylab(comparisonFoldchange)
+```
+
+## `r tit` GC + length
+#### p.adj < `r pcut` |lFC| > `r lfc` 
+
+```{r, include=TRUE}
+   ggplot(comp %>% dplyr::filter(padj < pcut, abs(log2FoldChange) > lfc), aes(x=gc_bin,y=log2FoldChange,color=length_bin)) + geom_boxplot() + geom_hline(yintercept = 0, color="red") + ylab(comparisonFoldchange)
+```
+
+## `r tit` length + GC
+#### p.adj < `r pcut` |lFC| > `r lfc` 
+
+```{r, include=TRUE}
+   ggplot(comp %>% dplyr::filter(padj < pcut, abs(log2FoldChange) > lfc), aes(x=length_bin,y=log2FoldChange,color=gc_bin)) + geom_boxplot() + geom_hline(yintercept = 0, color="red") + ylab(comparisonFoldchange) + idoplots::xrot() 
+  
+```
+
+## `r tit` Counts of Significant Genes
+#### p.adj < `r pcut` |lFC| > `r lfc` 
+
+```{r, include=TRUE}
+  compCounts <- comp %>% dplyr::group_by(length_bin, gc_bin, significant=ifelse(is.na(padj), FALSE, padj < pcut & abs(log2FoldChange) > lfc)) %>% dplyr::summarise(count=dplyr::n())
+  ggplot(compCounts, aes(x=length_bin,y=gc_bin,fill=count)) + 
+          geom_tile() + facet_grid(. ~ significant, labeller = label_both ) + viridis::scale_fill_viridis() + idoplots::xrot() 
+   
+```
+
+## `r tit` Ratios of Significant Genes
+#### p.adj < `r pcut` |lFC| > `r lfc` 
+
+```{r, include=TRUE}
+   compCountsRel <- comp %>% dplyr::group_by(length_bin, gc_bin) %>% dplyr::summarise(total=dplyr::n(), significant=sum(padj < pcut & abs(log2FoldChange) > lfc,na.rm = TRUE), ratio=significant/total)
+   ggplot(compCountsRel, aes(x=length_bin,y=gc_bin,color=ratio,size=total)) + geom_point(shape=15) + 
+                 viridis::scale_color_viridis(guide = guide_colourbar(title="ratio\nsignificant")) +         
+                 scale_size_continuous(range = c(4,18), breaks = c(50,100,500,1000,2000,3000)) + idoplots::xrot() 
+
+```
+
+## `r tit` Biotype Significant Genes
+#### p.adj < `r pcut` |lFC| > `r lfc` 
+```{r, include=TRUE}
+    ggplot(comp %>% dplyr::filter(padj < pcut, abs(log2FoldChange) > lfc), aes(x=gene_biotype,y=log2FoldChange)) + geom_boxplot() + geom_hline(yintercept = 0, color="red") + idoplots::xrot() + ylab(comparisonFoldchange)
+  
+```
+
+## `r tit` Biotype Significant Genes
+#### p.adj < `r pcut` |lFC| > `r lfc` 
+```{r, include=TRUE, asis=TRUE}
+    biotypes <- comp %>% dplyr::group_by(gene_biotype) %>% dplyr::summarise(total=dplyr::n(), significant = sum(padj < pcut & abs(log2FoldChange) > lfc, na.rm = TRUE), ratio=significant/total)
+   # ggplot(biotypes, aes(x=gene_biotype,y=) + geom_bar(stat="identity") + geom_hline(yintercept = 0, color="red") + idoplots::xrot() + ylab("ratio significant")
+    btab <- knitr::kable(biotypes %>% dplyr::filter(significant > 0) %>% dplyr::arrange(desc(total)))  
+    print(btab)
+```
+
+
+
+

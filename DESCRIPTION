@@ -1,0 +1,18 @@
+Package: deseq2analysis
+Type: Package
+Title: DESeq2 analysis
+Version: 0.3.0
+Author: Ido Tamir
+Maintainer: Ido Tamir <ido.tamir@vbcf.ac.at>
+Description: Analyses RNA-Seq data with DESeq2
+    Differential Gene Expression, HTML, xlsx, tab output of DGE, GO.
+License: GPLv3
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    testthat
+Imports:
+    magrittr, dplyr, purrrlyr, DESeq2, kableExtra, formattable, graph, GOstats, GO.db, ReactomePA, fgsea, DOSE, AnnotationDbi
+Depends:
+    ggplot2
+RoxygenNote: 6.1.1

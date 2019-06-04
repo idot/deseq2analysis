@@ -1,0 +1,66 @@
+---
+params: 
+    analysis_title: "DESeq2 differential expression"
+title: "`r params$analysis_title`"
+author: "VBCF-NGS"
+date: "`r format(Sys.time(), '%B %d, %Y %H:%M:%S', 'America/Chicago', T)`"
+output: html_document2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE, knitr.table.format = "html")
+library("formattable")
+library("deseq2analysis")
+theme_set(theme_bw())
+options(knitr.table.format = "html") 
+```
+
+```{r import, include=FALSE, cache=TRUE}
+ensembl <- readEnsembl(deseqconfig$ensembltable)
+grouping <- readGrouping(deseqconfig$groupingtable) # todo: enable filter grouping in deseqconfig
+h2id <- deseqconfig$import$header2id
+dds <- readCountsToDeseq2(deseqconfig$countstable, grouping, header2id=get(h2id), remove_genes = NULL, metacols=deseqconfig$import$metacols, skip=deseqconfig$import$skip)
+dds.r <- DESeq2::DESeq(dds, betaPrior = TRUE)
+comparisons <- readr::read_tsv(deseqconfig$comparisonstable)
+deseq.r <- purrrlyr::by_row(comparisons, function(row){ deseqResult(dds.r, row$cond1, row$cond2) }) %>% dplyr::pull(.out)
+rld <- DESeq2::rlog(dds.r)
+```
+
+```{r difffextcounts, fig.cap="Counts of deregulated genes"}
+
+  #color_bar sqishes the numbers
+   extractMultiResultsSignif(deseq.r, deseqconfig$deseq2$adjp, lfc <- deseqconfig$deseq2$log2fc)  %>% 
+        #dplyr::mutate(dereg=formattable::color_bar("lightgreen")(dereg), up=formattable::color_bar("lightyellow")(up), down=formattable::color_bar("lightorange")(down)) %>%
+        knitr::kable() %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"), latex_options = "striped")
+
+```
+
+```{r deseq,include=FALSE,message=FALSE,echo=FALSE,warning=FALSE,asis=FALSE}
+   deseqout <- NULL
+   for(dr in deseq.r){ 
+    deseq.result <- dr
+     deseqout <- c(deseqout, knitr::knit_child('deseq2_pairwise.Rmd', options = list(echo = FALSE, warning = FALSE,results = 'hide')))
+   }
+```
+
+# DESeq2 results: differentially expressed genes
+
+To subsequent diagnostic plots are all done with 
+an adjusted p-value cutoff of `r pcut` and a minimal
+log2 fold change of `r lfc`. This has no influence on the output of the tables which contain all data
+sorted by adjusted p-value and log2 fold change. The statistics columns of the tables are given in table \@ref(fig:deseqtabledesc).
+
+```{r deseqtabledesc}
+     
+
+```
+
+
+```{r deseqprint}
+   knitr::asis_output(deseqout)
+```
+
+# session info
+```{r sessioninfo}
+   sessionInfo()
+```

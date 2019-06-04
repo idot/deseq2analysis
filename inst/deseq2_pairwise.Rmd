@@ -1,0 +1,61 @@
+
+```{r, include=FALSE}
+#comparison was added by me to metadata(deseq.result)
+comparisongroups <- S4Vectors::metadata(deseq.result)$comparison[2:3]
+normcounts <- getCounts(dds.r, comparisongroups, grouping)
+filterThreshold <- getFilterThreshold(deseq.result)
+
+comp <- toSortedTibble(deseq.result, ensembl, filterThreshold, normcounts) 
+comparisonFoldchange <- getComparisonFoldChange(deseq.result)
+tit <- getComparison(deseq.result)
+titfile <- getComparisonString(deseq.result)
+
+if(deseqconfig$output$savetables){
+  saveTables(comp, titfile)
+}
+
+if(!is.null(deseqconfig$functional)){
+  testfunctionalFromConfig(comp, titfile, deseqconfig, tit)
+}
+  
+
+lfc <- deseqconfig$deseq2$log2fc
+pcut <- deseqconfig$deseq2$adjp 
+
+
+```
+
+
+
+
+## DESeq2 `r tit`
+### p.adj < `r pcut` |lFC| > `r lfc` 
+  
+  * `r getPosExplanation(getComparison(deseq.result))`
+  * `r getNegExplanation(getComparison(deseq.result))`
+  
+  
+### MA plot
+```{r, include=TRUE}
+   plotMAPlot(comp, pcut, lfc, comparisonFoldchange)
+```
+
+### Vulcano plot
+```{r, include=TRUE}
+   plotVulcano(comp, pcut, lfc, comparisonFoldchange)
+```
+
+### p-value distribution
+```{r, include=TRUE}
+   plotPvalDist(comp, pcut)
+```
+
+### independent filtering
+```{r, include=TRUE}
+   plotIndependentFiltering(comp, pcut, lfc, filterThreshold)
+```
+
+
+
+
+
