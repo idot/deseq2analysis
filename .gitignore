@@ -1,6 +1,9 @@
+.Rbuildignore
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
-.man
-.example
+deseq2analysis.Rproj
+man
+example
+
