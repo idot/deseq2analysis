@@ -85,5 +85,5 @@ sorted by adjusted p-value and log2 fold change. The statistics columns of the t
 
 # session info
 ```{r sessioninfo}
-   sessioninfo::sessionInfo()
+   sessioninfo::session_info()
 ```
