@@ -1,7 +1,7 @@
 Package: deseq2analysis
 Type: Package
 Title: DESeq2 analysis
-Version: 0.3.0
+Version: 0.4.0
 Author: Ido Tamir
 Maintainer: Ido Tamir <ido.tamir@vbcf.ac.at>
 Description: Analyses RNA-Seq data with DESeq2
@@ -12,7 +12,7 @@ LazyData: true
 Suggests: 
     testthat
 Imports:
-    magrittr, dplyr, purrrlyr, DESeq2, kableExtra, formattable, graph, GOstats, GO.db, ReactomePA, fgsea, DOSE, AnnotationDbi
+    magrittr, dplyr, purrrlyr, DESeq2, kableExtra, formattable, graph, GOstats, GO.db, ReactomePA, fgsea, DOSE, AnnotationDbi, genefilter, sessioninfo, idoplots
 Depends:
-    ggplot2
+    R (>= 3.5.0)
 RoxygenNote: 6.1.1

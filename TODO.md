@@ -1,12 +1,9 @@
 for combined data
 -----------------
-* plot for size factors
-* plot for read count
-* plot for sample counts/gene
 * correlation plots of normalised data independent of condition 
-* PCA for samples
 * maybe heatmap of 500 most diff-exp across all samples
-
+* UpSetR for comparisons > 2, else VennDiagram
+* maybe plot of genes with 0 counts
 
 for pairwise data
 -----------------
@@ -14,7 +11,11 @@ for pairwise data
 * PCA?
 
 
+general 
+------- 
 * make gene.tab optional
+
+
 
 
 

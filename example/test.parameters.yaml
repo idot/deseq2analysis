@@ -39,7 +39,7 @@ output:
    normcount: TRUE
 
 import:
-   #how to convert count column header to id eg. identity, digit5id, vbcf_bamname2id
+   #how to convert count column header to id eg. keep, digit5id, vbcf_bamname2id
    header2id: vbcf_bamname2id
    #how many metadata columns are left of the count columns
    metacols: 6

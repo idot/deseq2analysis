@@ -202,7 +202,7 @@ Motif gene sets based on conserved cis-regulatory motifs from a comparative anal
 
 # session info
 ```{r sessioninfo}
-   sessionInfo()
+   sessioninfo::sessionInfo()
 ```
 
 

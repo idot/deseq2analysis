@@ -118,4 +118,47 @@ plotIndependentFiltering <- function(comp, pcut, lfc, treshold){
            ylab("adjusted p-value") + xlab("log2(base mean)")
 }
 
+#' size factors plot
+#'
+#'
+#'
+#' @export
+plotSizeFactors <- function(dds.r){
+   ggplot(as.data.frame(SummarizedExperiment::colData(dds.r)), aes(x=sampleId, y=sizeFactor,color=group)) + geom_point() + geom_hline(yintercept = 1, color="darkgray")
+}
 
+#' total counts plot
+#'
+#'
+#'
+#' @export
+plotTotalCounts <- function(dds){
+    totalCounts <- colSums(BiocGenerics::counts(dds))
+    counts <- tibble::enframe(totalCounts, "sampleId", "count") %>%
+         dplyr::left_join(as.data.frame(SummarizedExperiment::colData(dds)), by=c(sampleId="sampleId"))
+    ggplot(counts,aes(x=sampleId,y=count,color=group)) + geom_point()
+}
+
+
+#' plot counts per gene normalised
+#'
+#'
+#' @export
+plotCountsPerGene <- function(dds.r, plus=0){
+    norm <-  BiocGenerics::counts(dds.r, normalized=TRUE)
+    normm <- reshape2::melt(norm, value.name="normalised", varnames = c("geneid", "sampleId")) %>%
+        dplyr::mutate(sampleId=as.character(sampleId)) %>%
+        dplyr::left_join(as.data.frame(SummarizedExperiment::colData(dds)), by=c(sampleId="sampleId"))
+    p <- ggplot(normm, aes(x=normalised + plus, color=group, linetype=as.factor(internal_replicate))) + geom_density()
+    p  + scale_x_continuous(trans = "log2", labels=scales::trans_format('log2', scales::math_format(2^.x))) + scale_linetype_discrete(name="replicate")
+}
+
+#' plot counts per gene normalised (+/- 1)
+#'
+#'
+#' @export
+plotCountsPerGeneBoth <- function(dds.r){
+    plus <- plotCountsPerGene(dds.r, 1) + xlab("normalised + 1")
+    zero <- plotCountsPerGene(dds.r, 0) + xlab("normalised, no 0 counts")
+    idoplots::grid_arrange_shared_legend(plus, zero)
+}

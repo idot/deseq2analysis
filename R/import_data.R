@@ -32,11 +32,11 @@ digit5id <- function(cols){
   stringr::str_extract(pattern="\\d{5}", string=cols)
 }
 
-#' identity
+#' keep column header as is
 #'
 #' @param column names to convert the ids from
 #' @export
-identity <- function(cols){
+keep <- function(cols){
   cols
 }
 
@@ -88,10 +88,19 @@ readCounts <- function(countpath, header2id=vbcf_bamname2id, remove_genes=NULL, 
 #'
 #' @export
 readGrouping <- function(groupingpath){
-  metadf <- read.table(groupingpath, header=TRUE, stringsAsFactors=TRUE)
-  metadf[,1] <- as.character(metadf[,1])
-  metadf
+  orig <- readr::read_tsv(groupingpath) %>% dplyr::mutate(sampleId=as.character(sampleId))
+  grouping <- orig %>%
+          dplyr::mutate(sampleId=as.character(sampleId)) %>%
+          dplyr::group_by(group) %>%
+          dplyr::arrange(sampleId) %>%
+          dplyr::mutate(internal_replicate=1:dplyr::n()) %>%
+          dplyr::ungroup() %>%
+          dplyr::mutate(group=factor(group))
+  grouporder <- match(orig$sampleId, grouping$sampleId)
+  groupingsorted <- grouping[grouporder,]
+  as.data.frame(grouping)
 }
+
 
 
 #' creates deseq2 DataSet with design by ~group from grouping table

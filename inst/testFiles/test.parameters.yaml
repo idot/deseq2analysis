@@ -3,8 +3,8 @@ outputname: Test.deseq.html
 
 countstable: test.counts.tab
 groupingtable: test.grouping.tab
-ensembltable: test.ensembl.GRCh38.genes.tab 
-comparisonstable: test.comparisons.tab 
+ensembltable: test.ensembl.GRCh38.genes.tab
+comparisonstable: test.comparisons.tab
 
 # parameters for DESeq2
 deseq2:
@@ -34,7 +34,7 @@ output:
    # add normalised counts to output tables
    normcount: TRUE
 import:
-   #how to convert count column header to id eg. identity, digit5id, vbcf_bamname2id
+   #how to convert count column header to id eg. keep, digit5id, vbcf_bamname2id
    header2id: vbcf_bamname2id
    #how many metadata columns are left of the count columns
    metacols: 6

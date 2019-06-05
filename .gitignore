@@ -6,4 +6,5 @@
 deseq2analysis.Rproj
 man
 example
-
+build.sh
+*.swp
