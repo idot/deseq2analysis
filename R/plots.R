@@ -148,7 +148,8 @@ plotCountsPerGene <- function(dds.r, plus=0){
     norm <-  BiocGenerics::counts(dds.r, normalized=TRUE)
     normm <- reshape2::melt(norm, value.name="normalised", varnames = c("geneid", "sampleId")) %>%
         dplyr::mutate(sampleId=as.character(sampleId)) %>%
-        dplyr::left_join(as.data.frame(SummarizedExperiment::colData(dds)), by=c(sampleId="sampleId"))
+        dplyr::left_join(as.data.frame(SummarizedExperiment::colData(dds.r)), by=c(sampleId="sampleId"))
+
     p <- ggplot(normm, aes(x=normalised + plus, color=group, linetype=as.factor(internal_replicate))) + geom_density()
     p  + scale_x_continuous(trans = "log2", labels=scales::trans_format('log2', scales::math_format(2^.x))) + scale_linetype_discrete(name="replicate")
 }
