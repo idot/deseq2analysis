@@ -4,7 +4,7 @@ params:
 title: "`r params$analysis_title`"
 author: "VBCF-NGS"
 date: "`r format(Sys.time(), '%B %d, %Y %H:%M:%S', 'America/Chicago', T)`"
-output: html_document2
+output: bookdown::html_document2
 ---
 
 ```{r setup, include=FALSE}

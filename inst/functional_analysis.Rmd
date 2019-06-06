@@ -4,7 +4,7 @@ params:
 title: "`r params$functional_title`"
 date: "`r format(Sys.time(), '%B %d, %Y %H:%M:%S', 'America/Chicago', T)`"
 output:
-  html_document:
+  rmarkdown::html_document:
     self_contained: yes
     theme: null
     highlight: null
