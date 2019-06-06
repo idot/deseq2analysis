@@ -15,7 +15,7 @@ deseq2:
 
 # parameters for functional analysis (GO, GSEA, ...)
 # to disable rename functional to something else like Xfunctional
-functional:
+xfunctional:
    # organism
    organism: Hs
    # idtype
