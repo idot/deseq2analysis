@@ -12,7 +12,7 @@ LazyData: true
 Suggests: 
     testthat
 Imports:
-    magrittr, dplyr, purrrlyr, DESeq2, kableExtra, formattable, graph, GOstats, GO.db, ReactomePA, fgsea, DOSE, AnnotationDbi, genefilter, sessioninfo, idoplots, rmarkdown, bookdown
+    magrittr, dplyr, purrrlyr, DESeq2, kableExtra, formattable, graph, GOstats, GO.db, ReactomePA, fgsea, DOSE, AnnotationDbi, genefilter, sessioninfo, idoplots, rmarkdown, bookdown, optparse, gridExtra, writexl
 Depends:
     R (>= 3.5.0)
 RoxygenNote: 6.1.1
