@@ -3,7 +3,7 @@
 ## Usage
 
 ```
-   deseq2analysis::analyseFromConfig("test.parameters.yaml")
+   deseq2analysis::analyseFromConfig("test.parameters.yaml", getwd())
 ```
 
 It expects as input data in the yaml config (see example/test.parameters.yaml)
@@ -14,7 +14,8 @@ It expects as input data in the yaml config (see example/test.parameters.yaml)
    the ensembltable can be created with a python script, and will also be made optional   
 
 ## Example
-   there is a very small example/test dataset in example
+   there is a very small example/test dataset in example, and it has to be
+   run from the example folder
    
 ```
    cd example
@@ -22,3 +23,8 @@ It expects as input data in the yaml config (see example/test.parameters.yaml)
 ```
 
 
+## Important
+   deseq2analysis::analyseFromConfig the knitdir has to specified correctly
+   in a singularity container its most often not getwd() !
+   its also better to specify all paths in the config file as absolute paths
+  
