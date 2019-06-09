@@ -240,7 +240,7 @@ knitLabels <- function(titfile, knitdir){
 #'
 #' @export
 generateMDLink <- function(title, link){
-   paste("[",title,"]", "(", link,")",sep="")
+   paste("[",title,"]", "(", link,")", sep="") # {:target='_blank'}???
 }
 
 #' returns a table with output files based on grouping and config
