@@ -19,24 +19,17 @@ if(!is.null(deseqconfig$functional)){
 }
   
 
-lfc <- deseqconfig$deseq2$log2fc
-pcut <- deseqconfig$deseq2$adjp 
-
-
 ```
-
-
-
 
 ## DESeq2 `r tit`
 ### p.adj < `r pcut` |lFC| > `r lfc` 
   
-  * `r getPosExplanation(getComparison(deseq.result))`
-  * `r getNegExplanation(getComparison(deseq.result))`
+  * `r getPosExplanation(tit)`
+  * `r getNegExplanation(tit)`
   
   
 ### MA plot
-```{r maplot`r titfile`, include=TRUE}
+```{r , include=TRUE}
    plotMAPlot(comp, pcut, lfc, comparisonFoldchange)
 ```
 

@@ -80,13 +80,16 @@ rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
    DESeq2::plotPCA(rlogFull, intgroup = "group", ntop = 500)
 ```
 
-
 ```{r deseq,include=FALSE,message=FALSE,echo=FALSE,warning=FALSE,asis=FALSE}
+   lfc <- deseqconfig$deseq2$log2fc
+   pcut <- deseqconfig$deseq2$adjp 
    deseqout <- NULL
+
    for(dr in deseq.r){ 
     deseq.result <- dr
-     deseqout <- c(deseqout, knitr::knit_child('deseq2_pairwise.Rmd', options = list(echo = FALSE, warning = FALSE,results = 'hide')))
+     deseqout <- c(deseqout, knitr::knit_child(system.file('deseq2_pairwise.Rmd',package="deseq2analysis"), options = list(echo = FALSE, warning = FALSE, results = 'hide')))
    }
+   
 ```
 
 # DESeq2 results: differentially expressed genes
