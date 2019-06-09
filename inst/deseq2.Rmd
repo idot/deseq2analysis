@@ -3,7 +3,7 @@ params:
     analysis_title: "DESeq2 differential expression"
 title: "`r params$analysis_title`"
 author: "VBCF-NGS"
-date: "`r format(Sys.time(), '%B %d, %Y %H:%M:%S', 'America/Chicago', T)`"
+date: "`r format(Sys.time(), '%d %B %Y %H:%M:%S', 'Europe/Vienna', T)`"
 output: bookdown::html_document2
 ---
 
