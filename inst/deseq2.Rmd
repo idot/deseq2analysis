@@ -76,7 +76,7 @@ rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
    plotTotalCounts(dds)
 ```
 
-
+## Diagnostic Plots Across all Conditions
 
 ```{r sizefactors, fig.cap="Size factors used for normalization of the gene counts"}
    plotSizeFactors(dds.r)
