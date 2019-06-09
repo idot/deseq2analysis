@@ -9,7 +9,7 @@
 analyseFromConfig <- function(configpath, knitdir){
 		deseqconfig <- yaml::read_yaml(configpath)
 		KNITDIR <- knitdir
-		print(deseqconfig)
+        print(deseqconfig)
 
 		form <- bookdown::gitbook( self_contained = TRUE, split_by="none", config = list() )
 

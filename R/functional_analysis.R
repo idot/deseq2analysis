@@ -457,8 +457,8 @@ goparameterdescription <- function(deseqconfig){
     log2FCExp <- functional$log2fc
 
 
-    paste("For determining up, down and deregulated genes we used an adjuste p-value cutoff of", pvalExp, "and a minimal log2 fold change of", log2FCExp,". ",
-          "The p-value cutoff for the GO-Term and KEGG analysis was ",pvalGo,". ")
+    paste("For determining up, down and deregulated genes we used an adjusted p-value cutoff of ", pvalExp, " and a minimal log2 fold change of ", log2FCExp,". ",
+          "The p-value cutoff for the GO-Term and KEGG analysis was ",pvalGo,". ", sep="")
   }
 }
 

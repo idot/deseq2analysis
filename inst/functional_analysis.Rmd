@@ -1,3 +1,5 @@
+
+
 ---
 params: 
     functional_title: "Functional Analysis"
@@ -13,7 +15,7 @@ output:
 ---
 
 
-```{r setup, echo = FALSE, include=FALSE, }
+```{r setup, echo = FALSE, include=FALSE, cache = FALSE}
 library(DOSE)
 library(ggplot2)
 library("clusterProfiler")

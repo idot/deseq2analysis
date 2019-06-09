@@ -54,7 +54,7 @@ test_that("we get the normalised counts as a tibble for all groups", {
 test_that("we create a sorted tibble for saving and for plotting of the data", {
   ensembl <- readEnsembl(filesPath("test.ensembl.GRCh38.genes.tab"))
   deseq.result <- readRDS(filesPath("test.deseq.result.RDS"))
-  comp <- toSortedTibble(deseq.result, ensembl)
+  comp <- toSortedTibble(deseq.result, ensembl, 0.01)
   expect_equal(nrow(comp), nrow(deseq.result) )
   expect_equal(colnames(comp)[1],"geneid")
 })
@@ -65,7 +65,7 @@ test_that("we create a sorted tibble for saving and for plotting of the data inc
   grouping <- readGrouping(filesPath("test.grouping.tab"))
   groups <- S4Vectors::metadata(deseq.result)$comparison[2:3]
   countsdata <- getCounts(readRDS(filesPath("test.dds.r.RDS")),groups)
-  comp <- toSortedTibble(deseq.result, ensembl, countsdata)
+  comp <- toSortedTibble(deseq.result, ensembl, 0.01, countsdata)
   expect_equal(nrow(comp), nrow(deseq.result))
   #TODO: test width of comp
 })

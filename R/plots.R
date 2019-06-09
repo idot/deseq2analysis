@@ -113,7 +113,7 @@ plotPvalDist <- function(comp, pcut){
 plotIndependentFiltering <- function(comp, pcut, lfc, treshold){
   ggplot(comp %>% dplyr::mutate(significant=is.finite(padj) & padj < pcut & abs(log2FoldChange) > lfc), aes(x=baseMean, y=-log10(padj),color=significant)) +
            geom_point() +
-           geom_vline(xintercept = treshold) +
+           geom_vline(xintercept = treshold, color="red") +
            scale_x_continuous(trans=scales::log2_trans(),breaks=scales::trans_breaks('log10', function(x) 10^x), label=scales::scientific_format()) +
            ylab("adjusted p-value") + xlab("log2(base mean)")
 }

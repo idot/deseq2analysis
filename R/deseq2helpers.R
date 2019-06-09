@@ -70,7 +70,7 @@ toSortedTibble <- function(deseq.result, ensembl, filterThreshold, countsdata=NU
     dplyr::select(-absFC) %>%
     dplyr::select(geneid, dplyr::everything())
     if(nrow(deseq.result) != nrow(comp.all)){
-      error <- paste("we lost some rows, should be left_join!: ", nrow(deseq.result), " -> ", nrow(comp.all))
+      error <- paste("we lost some rows in toSortedTibble, should be left_join!: ", nrow(deseq.result), " -> ", nrow(comp.all))
       stop(error)
     }
     comp.all
