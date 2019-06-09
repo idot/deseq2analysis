@@ -6,15 +6,16 @@
 #' @param knitdir folder to knit and create output in (caveat singularity. wdir is not writable)
 #'
 #' @export
-analyseFromConfig <- function(configpath, knitdir){
+analyseFromConfig <- function(configpath, knitdir, keep_intermediate=FALSE){
 		deseqconfig <- yaml::read_yaml(configpath)
 		KNITDIR <- knitdir
-        print(deseqconfig)
+		CLEAN <- !keep_intermediate
+    print(deseqconfig)
 
 		form <- bookdown::gitbook( self_contained = TRUE, split_by="none", config = list() )
 
 		rmarkdown::render(system.file("deseq2.Rmd", package="deseq2analysis"), knit_root_dir=KNITDIR, intermediates_dir=KNITDIR,
-                 output_format=form, output_file=deseqconfig$outputname, output_dir=KNITDIR, clean=TRUE,
+                 output_format=form, output_file=deseqconfig$outputname, output_dir=KNITDIR, clean=CLEAN,
                  params = list(analysis_title = deseqconfig$analysis_title )  )
 
 
@@ -24,7 +25,7 @@ analyseFromConfig <- function(configpath, knitdir){
 		      params <- readRDS(paramfile)
     			outbasehtmlfinal <- paste(outbasefun,"_functional_analysis.html",sep="")
     				rmarkdown::render(system.file("functional_analysis.Rmd", package="deseq2analysis"), knit_root_dir=KNITDIR, intermediates_dir=KNITDIR,
-                	output_format=form, output_file=outbasehtmlfinal, output_dir=KNITDIR, clean=TRUE, envir = new.env(),
+                	output_format=form, output_file=outbasehtmlfinal, output_dir=KNITDIR, clean=CLEAN, envir = new.env(),
                 	params = list(functional_title = paste(params$comparisontitle, "functional analysis"))
                 	)
 		}

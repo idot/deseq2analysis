@@ -1,4 +1,3 @@
-
 ---
 params: 
     analysis_title: "DESeq2 differential expression"
@@ -7,6 +6,29 @@ author: "VBCF-NGS"
 date: "`r format(Sys.time(), '%B %d, %Y %H:%M:%S', 'America/Chicago', T)`"
 output: bookdown::html_document2
 ---
+
+<style type="text/css">
+
+.figure {
+  border: 1px solid black;
+  padding: 1em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.figure .figure {
+  border: 0px;
+  padding: 0px;
+  margin: 0px;
+}
+
+.book .book-body .page-wrapper .page-inner {
+  max-width: 90%;
+}
+
+</style>
+
+
 
 ```{r setup, include=FALSE, cache = FALSE, cache.path=KNITDIR}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE, cache=FALSE, cache.path=KNITDIR)

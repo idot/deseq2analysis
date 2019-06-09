@@ -36,19 +36,22 @@ pcut <- deseqconfig$deseq2$adjp
   
   
 ### MA plot
-```{r, include=TRUE}
+```{r maplot`r titfile`, include=TRUE}
    plotMAPlot(comp, pcut, lfc, comparisonFoldchange)
 ```
 
+
 ### Vulcano plot
-```{r, include=TRUE}
+```{r , include=TRUE}
    plotVulcano(comp, pcut, lfc, comparisonFoldchange)
 ```
+
 
 ### p-value distribution
 ```{r, include=TRUE}
    plotPvalDist(comp, pcut)
 ```
+
 
 ### independent filtering
 ```{r, include=TRUE}
