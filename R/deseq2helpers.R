@@ -262,8 +262,8 @@ outputFilesTable <- function(deseqconfig, deseq.r){
             resv <- c(resv, `DGE tables`=comb)
         }
         if(!is.null(deseqconfig$functional)){
-            func <- paste(titfile,"_wt_functional_analysis.html",sep="")
-            funcz <-  paste(titfile,"_wt_functional_analysis.zip",sep="")
+            func <- paste(titfile,"_functional_analysis.html",sep="")
+            funcz <-  paste(titfile,"_functional_analysis.zip",sep="")
             funcl <- generateMDLink("html", func)
             funczl <- generateMDLink("zipped tab delimited", funcz)
             comb <- paste(funcl, funczl)
@@ -281,7 +281,7 @@ outputFilesTable <- function(deseqconfig, deseq.r){
 zipall <- function(deseqconfig, knitdir){
     zipbase <- gsub(".html",".zip", deseqconfig$outputname)
     zipfile <- paste(knitdir, "/", zipbase ,sep="")
-    zips <- dir(knitdir, pattern="*functional_analysis_files.zip", full.names = TRUE)
+    zips <- dir(knitdir, pattern="*functional_analysis_tables.zip", full.names = TRUE)
     html <- dir(knitdir, pattern="*html", full.names = TRUE)
     dn <- dir(knitdir, pattern="*diff.norm*", full.names=TRUE)
     allz <- c(zips, html, dn)

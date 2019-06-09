@@ -10,6 +10,7 @@ for pairwise data
 -----------------
 * heatmap
 * PCA?
+* entrez mapping statistics + GO mapping statistics, size of universe
 
 
 general 

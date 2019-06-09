@@ -43,7 +43,7 @@ library("clusterProfiler")
 library("deseq2analysis")
 options(knitr.table.format = "html") 
 theme_set(theme_bw())
-outtabledir <- paste(outbasefun,"_tables",sep="")
+outtabledir <- paste(outbasefun,"_functional_analysis_tables",sep="")
 dir.create(outtabledir)
 
 
