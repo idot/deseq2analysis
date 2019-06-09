@@ -94,39 +94,47 @@ rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
 
 
 ```{r deseqpairwise,include=FALSE,message=FALSE,echo=FALSE,warning=FALSE,asis=FALSE}
+   
    lfc <- deseqconfig$deseq2$log2fc
    pcut <- deseqconfig$deseq2$adjp 
-   deseqout <- NULL
-
-    
-   for(deseq.result in deseq.r){ 
-
-       #comparison was added by me to metadata(deseq.result)
-      comparisongroups <- S4Vectors::metadata(deseq.result)$comparison[2:3]
-      normcounts <- getCounts(dds.r, comparisongroups, grouping)
-      filterThreshold <- getFilterThreshold(deseq.result)
-      
-      comp <- toSortedTibble(deseq.result, ensembl, filterThreshold, normcounts) 
-      comparisonFoldchange <- getComparisonFoldChange(deseq.result)
-      tit <- getComparison(deseq.result)
-      titfile <- getComparisonString(deseq.result)
-      
-      if(deseqconfig$output$savetables){
-        saveTables(comp, titfile)
-      }
-      
-      if(!is.null(deseqconfig$functional)){
-        testfunctionalFromConfig(comp, titfile, deseqconfig, tit)
-      }
-      ADVENTUROUS <- FALSE
-      if(ADVENTUROUS){
-          pairRmd <- knitLabels(titfile, KNITDIR)
-      }else{
-          pairRmd <- system.file('deseq2_pairwise.Rmd', package="deseq2analysis")
-      }
-      deseqout <- c(deseqout, knitr::knit_child(pairRmd, options = list(echo = FALSE, warning = FALSE, results = 'hide')))
    
-    }
+
+   deseqout <- NULL
+   for(deseq.result in deseq.r){
+
+            #comparison was added by me to metadata(deseq.result)
+            comparisongroups <- S4Vectors::metadata(deseq.result)$comparison[2:3]
+            normcounts <- getCounts(dds.r, comparisongroups, grouping)
+            filterThreshold <- getFilterThreshold(deseq.result)
+
+            comp <- toSortedTibble(deseq.result, ensembl, filterThreshold, normcounts)
+            comparisonFoldchange <- getComparisonFoldChange(deseq.result)
+            tit <- getComparison(deseq.result)
+            titfile <- getComparisonString(deseq.result)
+
+            LOG(paste("creating files for: ", tit, titfile, deseqconfig$output$savetables ))
+            
+            if(deseqconfig$output$savetables){
+                saveTables(comp, titfile)
+            }
+
+            if(!is.null(deseqconfig$functional)){
+                testfunctionalFromConfig(comp, titfile, deseqconfig, tit)
+            }
+
+            ADVENTUROUS <- TRUE ## this works better than FALSE where I don't find any output files after the 1. loop.
+            if(ADVENTUROUS){
+                pairRmd <- knitLabels(titfile, KNITDIR)
+            }else{
+                pairRmd <- system.file('deseq2_pairwise.Rmd', package="deseq2analysis")
+            }
+
+            deseqout <- c(deseqout, knitr::knit_child(pairRmd, options = list(echo = FALSE, warning = FALSE, results = 'hide')))
+   }
+  
+   
+  ## cant' find correct environment:
+  ## deseqout <- createGroupComparisons(deseqconfig, deseq.r, dds.r, grouping, ensembl)
    
 ```
 

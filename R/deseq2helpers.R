@@ -148,6 +148,7 @@ getNegExplanation <- function(comparison){
 #'
 #' @export
 saveTables <- function(comp.all, pathbase){
+  LOG(paste("saving tables to ", pathbase))
   readr::write_tsv(comp.all, paste(pathbase, ".diff.norm.tab",sep=""))
   writexl::write_xlsx(comp.all, paste(pathbase, ".diff.norm.xlsx",sep=""))
 }
@@ -198,6 +199,10 @@ extractUpDownSignif <- function(comparison, pcut, lfc){
 
 #' extract counts of significanlty deregulated genes for a list of comparisons
 #'
+#' @param result comarison result list
+#' @param pcut the adjusted p-value cutoff
+#' @param lfc the absolute log 2 fold change cutoff
+#'
 #' @export
 extractMultiResultsSignif <- function(result, pcut, lfc){
   do.call("rbind", lapply(result, function(r){
@@ -208,6 +213,8 @@ extractMultiResultsSignif <- function(result, pcut, lfc){
 
 #' extract counts of significanlty deregulated genes for one of comparison
 #' but multiple log2 fold changes
+#'
+#' @param compasison the comparison data table
 #'
 #' @export
 extractMultiLFCSignif <- function(comparison){
@@ -221,6 +228,8 @@ extractMultiLFCSignif <- function(comparison){
 #'
 #' https://github.com/yihui/knitr-examples/blob/master/041-label-i.Rmd
 #'
+#' @param titfile the group comparison name suitable for a path
+#' @param knitdir the directory where knitr runs
 #'
 #' @export
 knitLabels <- function(titfile, knitdir){
@@ -238,12 +247,18 @@ knitLabels <- function(titfile, knitdir){
 
 #' generates a link for md
 #'
+#' @param title the tile of the link
+#' @param link the url
+#'
 #' @export
 generateMDLink <- function(title, link){
    paste("[",title,"]", "(", link,")", sep="") # {:target='_blank'}???
 }
 
 #' returns a table with output files based on grouping and config
+#'
+#' @param deseqconfig the deseq config
+#' @param deseq.r the list with all comparisons
 #'
 #' @export
 outputFilesTable <- function(deseqconfig, deseq.r){
@@ -263,7 +278,7 @@ outputFilesTable <- function(deseqconfig, deseq.r){
         }
         if(!is.null(deseqconfig$functional)){
             func <- paste(titfile,"_functional_analysis.html",sep="")
-            funcz <-  paste(titfile,"_functional_analysis.zip",sep="")
+            funcz <-  paste(titfile,"_functional_analysis_tables.zip",sep="")
             funcl <- generateMDLink("html", func)
             funczl <- generateMDLink("zipped tab delimited", funcz)
             comb <- paste(funcl, funczl)
@@ -276,6 +291,8 @@ outputFilesTable <- function(deseqconfig, deseq.r){
 
 #' zips all output files
 #'
+#' @param deseqconfig the deseqconfig
+#' @param knitdir the dir where its being knitted
 #'
 #' @export
 zipall <- function(deseqconfig, knitdir){
@@ -288,5 +305,56 @@ zipall <- function(deseqconfig, knitdir){
     zip::zipr(zipfile = zipfile, files = allz)
 }
 
+
+#' process group comparisons in loop
+#'
+#' @param deseqconfig the deseq config
+#' @param deseq.r the list with all comparisons
+#' @param dds.r the normalised values experimentset
+#' @param grouping the groping table
+#' @param ensembl the object containing ensembl annotation
+#'
+#' @export
+createGroupComparisons <- function(deseqconfig, deseq.r, dds.r, grouping, ensembl){
+      deseqout <- NULL
+      for(deseq.result in deseq.r){
+
+            #comparison was added by me to metadata(deseq.result)
+            comparisongroups <- S4Vectors::metadata(deseq.result)$comparison[2:3]
+            normcounts <- getCounts(dds.r, comparisongroups, grouping)
+            filterThreshold <- getFilterThreshold(deseq.result)
+
+            comp <- toSortedTibble(deseq.result, ensembl, filterThreshold, normcounts)
+            comparisonFoldchange <- getComparisonFoldChange(deseq.result)
+            tit <- getComparison(deseq.result)
+            titfile <- getComparisonString(deseq.result)
+
+            if(deseqconfig$output$savetables){
+                saveTables(comp, titfile)
+            }
+
+            if(!is.null(deseqconfig$functional)){
+                testfunctionalFromConfig(comp, titfile, deseqconfig, tit)
+            }
+
+            ADVENTUROUS <- FALSE
+            if(ADVENTUROUS){
+                pairRmd <- knitLabels(titfile, KNITDIR)
+            }else{
+                pairRmd <- system.file('deseq2_pairwise.Rmd', package="deseq2analysis")
+            }
+            deseqout <- c(deseqout, knitr::knit_child(pairRmd, envir=globalenv(), options = list(echo = FALSE, warning = FALSE, results = 'hide')))
+      }
+      deseqout
+}
+
+#' LOG to console in knitr
+#'
+#' @param message
+#'
+#' @export
+LOG <- function(message){
+    write(message, stderr())
+}
 
 
