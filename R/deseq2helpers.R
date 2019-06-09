@@ -236,3 +236,40 @@ knitLabels <- function(titfile, knitdir){
       outpath
 }
 
+#' generates a link for md
+#'
+#' @export
+generateMDLink <- function(title, link){
+   paste("[",title,"]", "(", link,")",sep="")
+}
+
+#' returns a table with output files based on grouping and config
+#'
+#' @export
+outputFilesTable <- function(deseqconfig, deseq.r){
+    purrr::map_df(deseq.r, function(deseq.result){
+        #comparison was added by me to metadata(deseq.result)
+        comparisongroups <- S4Vectors::metadata(deseq.result)$comparison[2:3]
+        tit <- getComparison(deseq.result)
+        titfile <- getComparisonString(deseq.result)
+        resv <- c(comparison=tit)
+        if(deseqconfig$output$savetables){
+            exl <- paste(titfile, ".diff.norm.xlsx",sep="")
+            tab <- paste(titfile, ".diff.norm.tab",sep="")
+            exll <- generateMDLink("excel file", exl)
+            tabl <- generateMDLink("tab delimited", tab)
+            comb <- paste(exll, tabl)
+            resv <- c(resv, `DGE tables`=comb)
+        }
+        if(!is.null(deseqconfig$functional)){
+            func <- paste(titfile,"_wt_functional_analysis.html",sep="")
+            funcz <-  paste(titfile,"_wt_functional_analysis.zip",sep="")
+            funcl <- generateMDLink("html", func)
+            funczl <- generateMDLink("zipped tab delimited", funcz)
+            comb <- paste(funcl, funczl)
+            resv <- c(resv, `functional analysis`=comb)
+        }
+        dplyr::bind_rows(resv)
+    })
+}
+
