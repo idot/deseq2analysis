@@ -29,7 +29,7 @@ test_that("we can import a counts file from featureCounts and it filters some ge
 test_that("we can get a metadata matrix from a grouping table", {
     grouping <- readGrouping(filesPath("test.grouping.tab"))
     expect_equal(15, nrow(grouping))
-    expect_equal(2, ncol(grouping))
+    expect_equal(3, ncol(grouping))
     expect_equal(as.character(83653:83667), grouping[,1])
 })
 
