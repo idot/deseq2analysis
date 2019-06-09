@@ -217,4 +217,22 @@ extractMultiLFCSignif <- function(comparison){
 }
 
 
+#' adds labels to chunks in deseq2_pairwise.Rmd (tpl)
+#'
+#' https://github.com/yihui/knitr-examples/blob/master/041-label-i.Rmd
+#'
+#'
+#' @export
+knitLabels <- function(titfile, knitdir){
+      knitr::pat_brew() ## switching to pat_brew
+      infile <- system.file('deseq2_pairwise.tpl',package="deseq2analysis")
+      titfiles <- gsub("_","", titfile)
+      withLabels <- knitr::knit(text = readLines(infile))
+      outpath <- paste(knitdir,"/comp_",titfile,".Rmd",sep="")
+      fileConn<-file(outpath)
+      writeLines(withLabels, fileConn)
+      close(fileConn)
+      knitr::pat_md()
+      outpath
+}
 

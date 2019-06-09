@@ -85,10 +85,35 @@ rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
    pcut <- deseqconfig$deseq2$adjp 
    deseqout <- NULL
 
-   for(dr in deseq.r){ 
-    deseq.result <- dr
-     deseqout <- c(deseqout, knitr::knit_child(system.file('deseq2_pairwise.Rmd',package="deseq2analysis"), options = list(echo = FALSE, warning = FALSE, results = 'hide')))
-   }
+    
+   for(deseq.result in deseq.r){ 
+
+       #comparison was added by me to metadata(deseq.result)
+      comparisongroups <- S4Vectors::metadata(deseq.result)$comparison[2:3]
+      normcounts <- getCounts(dds.r, comparisongroups, grouping)
+      filterThreshold <- getFilterThreshold(deseq.result)
+      
+      comp <- toSortedTibble(deseq.result, ensembl, filterThreshold, normcounts) 
+      comparisonFoldchange <- getComparisonFoldChange(deseq.result)
+      tit <- getComparison(deseq.result)
+      titfile <- getComparisonString(deseq.result)
+      
+      if(deseqconfig$output$savetables){
+        saveTables(comp, titfile)
+      }
+      
+      if(!is.null(deseqconfig$functional)){
+        testfunctionalFromConfig(comp, titfile, deseqconfig, tit)
+      }
+      ADVENTUROUS <- TRUE
+      if(ADVENTUROUS){
+        pairRmd <- knitLabels(titfile, KNITDIR)
+      }else{
+        pairRmd <- system.file('deseq2_pairwise.Rmd', package="deseq2analysis")
+      }
+      deseqout <- c(deseqout, knitr::knit_child(pairRmd, options = list(echo = FALSE, warning = FALSE, results = 'hide')))
+   
+    }
    
 ```
 
