@@ -224,7 +224,7 @@ Motif gene sets based on conserved cis-regulatory motifs from a comparative anal
 ```
 
 ```{r zipall, echo=FALSE, warnings=FALSE, include=FALSE}
-   zipfunctabs(outtabledir)
+   zipfunctabs(outtabledir, KNITDIR)
 ```
 
 # session info

@@ -474,12 +474,12 @@ goparameterdescription <- function(deseqconfig){
 #' zips all files in the functional_analysis folder
 #'
 #'
-#' @exports
-zipfunctabs <- function(outtabledir){
+#' @export
+zipfunctabs <- function(outtabledir, knitdir){
   if(!is.null(outtabledir)){
-        zipfile = paste(outtabledir,".zip",sep="")
-        files2zip <- dir(outtabledir, full.names = TRUE)
-        zip::zip(zipfile = zipfile, files = files2zip)
+        zipfile <- paste(knitdir, "/", outtabledir,".zip",sep="")
+        files2zip <- dir(paste(knitdir, "/", outtabledir, sep=""), full.names = TRUE)
+        zip::zipr(zipfile = zipfile, files = files2zip)
   }
 }
 

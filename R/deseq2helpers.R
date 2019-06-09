@@ -273,3 +273,20 @@ outputFilesTable <- function(deseqconfig, deseq.r){
     })
 }
 
+
+#' zips all output files
+#'
+#'
+#' @export
+zipall <- function(deseqconfig, knitdir){
+    zipbase <- gsub(".html",".zip", deseqconfig$outputname)
+    zipfile <- paste(knitdir, "/", zipbase ,sep="")
+    zips <- dir(knitdir, pattern="*functional_analysis_files.zip", full.names = TRUE)
+    html <- dir(knitdir, pattern="*html", full.names = TRUE)
+    dn <- dir(knitdir, pattern="*diff.norm*", full.names=TRUE)
+    allz <- c(zips, html, dn)
+    zip::zipr(zipfile = zipfile, files = allz)
+}
+
+
+
