@@ -4,7 +4,7 @@
 params: 
     functional_title: "Functional Analysis"
 title: "`r params$functional_title`"
-date: "`r format(Sys.time(), '%B %d, %Y %H:%M:%S', 'America/Chicago', T)`"
+date: "`r format(Sys.time(), '%d %B %Y %H:%M:%S', 'Europe/Vienna', T)`"
 output:
   rmarkdown::html_document:
     self_contained: yes
@@ -221,6 +221,10 @@ Motif gene sets based on conserved cis-regulatory motifs from a comparative anal
 
 ```{r, echo=FALSE, warnings=FALSE}
    datatabGSEA(gseaL$gsea, topPathways, "GSEAC3", outtabledir, outbasefun)
+```
+
+```{r zipall, echo=FALSE, warnings=FALSE, include=FALSE}
+   zipfunctabs(outtabledir, KNITDIR)
 ```
 
 # session info

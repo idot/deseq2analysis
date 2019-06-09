@@ -30,6 +30,9 @@ analyseFromConfig <- function(configpath, knitdir, keep_intermediate=FALSE){
                 	)
 		}
 
+		if(deseqconfig$output$zipall){
+		    zipall(deseqconfig, KNITDIR)
+		}
 
 }
 

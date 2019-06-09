@@ -7,25 +7,25 @@
   
   
 ### MA plot
-```{r, fig.cap="MA Plot", include=TRUE}
+```{r ma-<% titfiles %>, fig.cap="MA Plot", include=TRUE}
    plotMAPlot(comp, pcut, lfc, comparisonFoldchange)
 ```
 
 
 ### Vulcano plot
-```{r, fig.cap="Vulcano Plot", include=TRUE}
+```{r vulcano-<% titfiles %>, fig.cap="Vulcano Plot", include=TRUE}
    plotVulcano(comp, pcut, lfc, comparisonFoldchange)
 ```
 
 
 ### p-value distribution
-```{r, fig.cap="p-Value distribution", include=TRUE}
+```{r pvaldist-<% titfiles %>, fig.cap="p-Value distribution", include=TRUE}
    plotPvalDist(comp, pcut)
 ```
 
 
 ### independent filtering
-```{r, fig.cap="independent filtering", include=TRUE}
+```{r independent-<% titfiles %>, fig.cap="independent filtering", include=TRUE}
    plotIndependentFiltering(comp, pcut, lfc, filterThreshold)
 ```
 

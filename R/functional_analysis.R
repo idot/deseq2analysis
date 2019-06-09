@@ -358,6 +358,14 @@ extractGSEAOverviewCollapsedTop <- function(gseaL, maxPathway, categoryFilter, p
 }
 
 
+#' path of output table
+#'
+#'
+#' @export
+outTableFunctionalPath <- function(outtabledir, outbasefun, suffix){
+    paste(outtabledir, "/", outbasefun, "_", suffix, "_functional_analysis.tab",sep="")
+}
+
 #' datatable for GO
 #' data comes in in long format, which is why distinct is necessary
 #'
@@ -368,7 +376,7 @@ datatabGO <- function(dat, suffix, outtabledir, outbasefun){
   tabvalshtml <- dat %>% dplyr::ungroup() %>% dplyr::select(-dplyr::one_of(c("go.result.index","go.oddsRatio","go.term","go.expCount","go.gene.id","go.gene.ids", "ontology"))) %>% dplyr::distinct()
   if(! is.null(outtabledir) & ! is.null(outbasefun)){
      tabvalstab <- dat %>% dplyr::ungroup() %>% dplyr::select(-dplyr::one_of(c("go.result.index", "go.link","go.gene.id")))  %>% dplyr::distinct()
-     readr::write_tsv(tabvalstab, paste(outtabledir, "/", outbasefun, "_", suffix, "_functional_analysis.tab",sep=""))
+     readr::write_tsv(tabvalstab, outTableFunctionalPath(outtabledir, outbasefun, suffix))
   }
   tabvalshtml %>% DT::datatable(escape=FALSE) %>% DT::formatSignif(c('go.pval'), 3)
 }
@@ -380,7 +388,7 @@ datatabGO <- function(dat, suffix, outtabledir, outbasefun){
 #' @export
 datatabKEGG <- function(dat, suffix, outtabledir, outbasefun){
   if(! is.null(outtabledir) & ! is.null(outbasefun)){
-     readr::write_tsv(dat, paste(outtabledir, "/", outbasefun, "_", suffix, "_functional_analysis.tab",sep=""))
+     readr::write_tsv(dat, outTableFunctionalPath(outtabledir, outbasefun, suffix))
   }
   DT::datatable(dat, escape=FALSE) %>% DT::formatSignif(c('Pvalue','ExpCount'), 3)
 
@@ -393,7 +401,7 @@ datatabKEGG <- function(dat, suffix, outtabledir, outbasefun){
 #' @export
 datatabReact <- function(dat, suffix, outtabledir, outbasefun){
   if(! is.null(outtabledir) & ! is.null(outbasefun)){
-    readr::write_tsv(dat, paste(outtabledir, "/", outbasefun, "_", suffix, "_functional_analysis.tab",sep=""))
+    readr::write_tsv(dat, outTableFunctionalPath(outtabledir, outbasefun, suffix))
   }
   DT::datatable(dat, escape=FALSE)
 }
@@ -409,7 +417,7 @@ datatabGSEA <- function(gsea, toppathways, suffix, outtabledir, outbasefun){
     dplyr::mutate(pathwayl=paste0('<a target="_blank" href="http://software.broadinstitute.org/gsea/msigdb/geneset_page.jsp?geneSetName=',pathway,'">',pathway,'</a>',sep="")) %>%
     dplyr::select(-pathway)
   if(! is.null(outtabledir) & ! is.null(outbasefun)){
-    readr::write_tsv(dats, paste(outtabledir, "/", outbasefun, "_", suffix, "_functional_analysis.tab",sep=""))
+    readr::write_tsv(dats, outTableFunctionalPath(outtabledir, outbasefun, suffix))
   }
   DT::datatable(dats, escape=FALSE) %>% DT::formatSignif(c('padj'),3)
 }
@@ -463,6 +471,15 @@ goparameterdescription <- function(deseqconfig){
 }
 
 
-
-
+#' zips all files in the functional_analysis folder
+#'
+#'
+#' @export
+zipfunctabs <- function(outtabledir, knitdir){
+  if(!is.null(outtabledir)){
+        zipfile <- paste(knitdir, "/", outtabledir,".zip",sep="")
+        files2zip <- dir(paste(knitdir, "/", outtabledir, sep=""), full.names = TRUE)
+        zip::zipr(zipfile = zipfile, files = files2zip)
+  }
+}
 

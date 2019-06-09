@@ -1,7 +1,7 @@
 Package: deseq2analysis
 Type: Package
 Title: DESeq2 analysis
-Version: 0.4.0
+Version: 0.5.0
 Author: Ido Tamir
 Maintainer: Ido Tamir <ido.tamir@vbcf.ac.at>
 Description: Analyses RNA-Seq data with DESeq2

@@ -3,7 +3,7 @@ params:
     analysis_title: "DESeq2 differential expression"
 title: "`r params$analysis_title`"
 author: "VBCF-NGS"
-date: "`r format(Sys.time(), '%B %d, %Y %H:%M:%S', 'America/Chicago', T)`"
+date: "`r format(Sys.time(), '%d %B %Y %H:%M:%S', 'Europe/Vienna', T)`"
 output: bookdown::html_document2
 ---
 
@@ -50,12 +50,23 @@ deseq.r <- purrrlyr::by_row(comparisons, function(row){ deseqResult(dds.r, row$c
 rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
 ```
 
-```{r difffextcounts, fig.cap="Counts of deregulated genes"}
+# DESeq2 analysis: overview
+
+
+## Output Files
+
+```{r outputfiles}
+   outputFilesTable(deseqconfig, deseq.r) %>%  knitr::kable(caption="output files") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"), latex_options = "striped")
+```
+
+
+## Counts of Deregulated Genes
+```{r difffextcounts}
 
   #color_bar sqishes the numbers
    extractMultiResultsSignif(deseq.r, deseqconfig$deseq2$adjp, lfc <- deseqconfig$deseq2$log2fc)  %>% 
         #dplyr::mutate(dereg=formattable::color_bar("lightgreen")(dereg), up=formattable::color_bar("lightyellow")(up), down=formattable::color_bar("lightorange")(down)) %>%
-        knitr::kable() %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"), latex_options = "striped")
+        knitr::kable(caption="Counts of deregulated genes") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"), latex_options = "striped")
 
 ```
 
@@ -65,11 +76,12 @@ rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
    plotTotalCounts(dds)
 ```
 
-
+## Diagnostic Plots Across all Conditions
 
 ```{r sizefactors, fig.cap="Size factors used for normalization of the gene counts"}
    plotSizeFactors(dds.r)
 ```
+
 
 ```{r countspergene, fig.cap="Size factor normalised counts per gene"}
    plotCountsPerGeneBoth(dds.r)
@@ -80,19 +92,45 @@ rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
    DESeq2::plotPCA(rlogFull, intgroup = "group", ntop = 500)
 ```
 
-```{r deseq,include=FALSE,message=FALSE,echo=FALSE,warning=FALSE,asis=FALSE}
+
+```{r deseqpairwise,include=FALSE,message=FALSE,echo=FALSE,warning=FALSE,asis=FALSE}
    lfc <- deseqconfig$deseq2$log2fc
    pcut <- deseqconfig$deseq2$adjp 
    deseqout <- NULL
 
-   for(dr in deseq.r){ 
-    deseq.result <- dr
-     deseqout <- c(deseqout, knitr::knit_child(system.file('deseq2_pairwise.Rmd',package="deseq2analysis"), options = list(echo = FALSE, warning = FALSE, results = 'hide')))
-   }
+    
+   for(deseq.result in deseq.r){ 
+
+       #comparison was added by me to metadata(deseq.result)
+      comparisongroups <- S4Vectors::metadata(deseq.result)$comparison[2:3]
+      normcounts <- getCounts(dds.r, comparisongroups, grouping)
+      filterThreshold <- getFilterThreshold(deseq.result)
+      
+      comp <- toSortedTibble(deseq.result, ensembl, filterThreshold, normcounts) 
+      comparisonFoldchange <- getComparisonFoldChange(deseq.result)
+      tit <- getComparison(deseq.result)
+      titfile <- getComparisonString(deseq.result)
+      
+      if(deseqconfig$output$savetables){
+        saveTables(comp, titfile)
+      }
+      
+      if(!is.null(deseqconfig$functional)){
+        testfunctionalFromConfig(comp, titfile, deseqconfig, tit)
+      }
+      ADVENTUROUS <- FALSE
+      if(ADVENTUROUS){
+          pairRmd <- knitLabels(titfile, KNITDIR)
+      }else{
+          pairRmd <- system.file('deseq2_pairwise.Rmd', package="deseq2analysis")
+      }
+      deseqout <- c(deseqout, knitr::knit_child(pairRmd, options = list(echo = FALSE, warning = FALSE, results = 'hide')))
+   
+    }
    
 ```
 
-# DESeq2 results: differentially expressed genes
+# DESeq2 results: pairwise comparisons
 
 To subsequent diagnostic plots are all done with 
 an adjusted p-value cutoff of `r pcut` and a minimal

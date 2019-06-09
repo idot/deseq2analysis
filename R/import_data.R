@@ -98,7 +98,7 @@ readGrouping <- function(groupingpath){
           dplyr::mutate(group=factor(group))
   grouporder <- match(orig$sampleId, grouping$sampleId)
   groupingsorted <- grouping[grouporder,]
-  as.data.frame(grouping)
+  as.data.frame(groupingsorted)
 }
 
 

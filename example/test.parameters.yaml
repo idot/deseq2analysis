@@ -15,7 +15,7 @@ deseq2:
 
 # parameters for functional analysis (GO, GSEA, ...)
 # to disable rename functional to something else like Xfunctional
-xfunctional:
+functional:
    # organism
    organism: Hs
    # idtype
@@ -37,6 +37,8 @@ output:
    savetables: TRUE
    # add normalised counts to output tables
    normcount: TRUE
+   # create one zip file
+   zipall: TRUE
 
 import:
    #how to convert count column header to id eg. keep, digit5id, vbcf_bamname2id
