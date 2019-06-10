@@ -53,7 +53,7 @@ rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
 # DESeq2 analysis: overview
 
 
-## Output Files
+## Output Files and Other Analyses
 
 ```{r outputfiles}
    outputFilesTable(deseqconfig, deseq.r) %>%  knitr::kable(caption="output files") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"), latex_options = "striped")

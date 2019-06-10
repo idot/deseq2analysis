@@ -90,7 +90,7 @@ plotMAPlot <- function(comp, pcut, lfc, compname){
     dplyr::mutate(lfci=!is.finite(log2FoldChange), lfcm = ifelse(lfci, maxLFC * sign(log2FoldChange),log2FoldChange) , significant = is.finite(padj) & padj < pcut & abs(log2FoldChange) > lfc)
   ggplot(comps, aes(x=baseMean,y=lfcm,colour=significant)) +
      geom_point(aes(size=2,alpha=ifelse(significant, 0.7,0.3))) +
-     scale_x_continuous(trans=scales::log2_trans(),breaks=scales::trans_breaks('log10', function(x) 10^x), label=scales::scientific_format()) +
+     idoplots::scale_x_log2() +
      scale_y_continuous(limits=c(-maxLFCs,maxLFCs)) + xlab("mean of normalized counts") + ylab(compname) +
      scale_alpha_identity() + scale_size_identity() + guides(colour=guide_legend("significant"), alpha=FALSE, size=FALSE)
 }
@@ -113,9 +113,8 @@ plotPvalDist <- function(comp, pcut){
 plotIndependentFiltering <- function(comp, pcut, lfc, treshold){
   ggplot(comp %>% dplyr::mutate(significant=is.finite(padj) & padj < pcut & abs(log2FoldChange) > lfc), aes(x=baseMean, y=-log10(padj),color=significant)) +
            geom_point() +
-           geom_vline(xintercept = treshold, color="red") +
-           scale_x_continuous(trans=scales::log2_trans(),breaks=scales::trans_breaks('log10', function(x) 10^x), label=scales::scientific_format()) +
-           ylab("adjusted p-value") + xlab("log2(base mean)")
+           geom_vline(xintercept = treshold, color="red") + idoplots::scale_x_log2() +
+           ylab("-log10(adjusted p-value)") + xlab("log2(base mean)")
 }
 
 #' size factors plot
@@ -124,7 +123,7 @@ plotIndependentFiltering <- function(comp, pcut, lfc, treshold){
 #'
 #' @export
 plotSizeFactors <- function(dds.r){
-   ggplot(as.data.frame(SummarizedExperiment::colData(dds.r)), aes(x=sampleId, y=sizeFactor,color=group)) + geom_point() + geom_hline(yintercept = 1, color="darkgray")
+   ggplot(as.data.frame(SummarizedExperiment::colData(dds.r)), aes(x=sampleId, y=sizeFactor,color=group)) + geom_point() + geom_hline(yintercept = 1, color="darkgray") + ylab("size factor") + idoplots::xrot()
 }
 
 #' total counts plot
@@ -136,7 +135,7 @@ plotTotalCounts <- function(dds){
     totalCounts <- colSums(BiocGenerics::counts(dds))
     counts <- tibble::enframe(totalCounts, "sampleId", "count") %>%
          dplyr::left_join(as.data.frame(SummarizedExperiment::colData(dds)), by=c(sampleId="sampleId"))
-    ggplot(counts,aes(x=sampleId,y=count,color=group)) + geom_point()
+    ggplot(counts,aes(x=sampleId,y=count,color=group)) + geom_point() + idoplots::xrot()
 }
 
 
@@ -151,7 +150,7 @@ plotCountsPerGene <- function(dds.r, plus=0){
         dplyr::left_join(as.data.frame(SummarizedExperiment::colData(dds.r)), by=c(sampleId="sampleId"))
 
     p <- ggplot(normm, aes(x=normalised + plus, color=group, linetype=as.factor(internal_replicate))) + geom_density()
-    p  + scale_x_continuous(trans = "log2", labels=scales::trans_format('log2', scales::math_format(2^.x))) + scale_linetype_discrete(name="replicate")
+    p  + idoplots::scale_x_log2()
 }
 
 #' plot counts per gene normalised (+/- 1)
