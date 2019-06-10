@@ -93,10 +93,10 @@ The GeneOntology analysis test for overrepresentation of groups of genes within 
    emptyTable(as.data.frame(goup$react), datatabReact, "UpReact", outtabledir, outbasefun)
 ```
 ```{r, echo=FALSE}
-   plotEmpty(goup$react,  dotplot(goup$react, showCategory=15))
+   plotEmpty(goup$react,  enrichplot::dotplot(goup$react, showCategory=15))
 ```
 ```{r, echo=FALSE}
-   plotEmpty(goup$react,  emapplot(goup$react))
+   plotEmpty(goup$react,  enrichplot::emapplot(goup$react))
 ```
 
 
@@ -128,10 +128,10 @@ The GeneOntology analysis test for overrepresentation of groups of genes within 
    datatabReact(as.data.frame(godn$react), "DnReact", outtabledir, outbasefun)
 ```
 ```{r, echo=FALSE}
-   plotEmpty(godn$react,  dotplot(godn$react, showCategory=15))
+   plotEmpty(godn$react,  enrichplot::dotplot(godn$react, showCategory=15))
 ```
 ```{r, echo=FALSE}
-   plotEmpty(godn$react,  emapplot(godn$react))
+   plotEmpty(godn$react,  enrichplot::emapplot(godn$react))
 ```
 
 
@@ -163,10 +163,10 @@ The GeneOntology analysis test for overrepresentation of groups of genes within 
    emptyTable(as.data.frame(gode$react), datatabReact, "DrReact", outtabledir, outbasefun)
 ```
 ```{r, echo=FALSE}
-   plotEmpty(gode$react,  dotplot(gode$react, showCategory=15))
+   plotEmpty(gode$react,  enrichplot::dotplot(gode$react, showCategory=15))
 ```
 ```{r, echo=FALSE}
-   plotEmpty(gode$react,  emapplot(gode$react))
+   plotEmpty(gode$react,  enrichplot::emapplot(gode$react))
 ```
 
 # Gene Set Enrichment Analysis
