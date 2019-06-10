@@ -150,7 +150,7 @@ The GeneOntology analysis test for overrepresentation of groups of genes within 
 
 ### GO cellular component
 ```{r, echo = FALSE}
-   emptyTable(gode$cc, gdatatabGO, "DrGoCc", outtabledir, outbasefun)
+   emptyTable(gode$cc, datatabGO, "DrGoCc", outtabledir, outbasefun)
 ```
 
 ## KEGG
