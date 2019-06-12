@@ -91,7 +91,7 @@ deseq.r <- dataList$deseq.r
 
 
 ```{r dispest, fig.cap="Dispersion estimates"}
-   DESeq2::plotDispEsts(dds.r)
+   plotDispEst(dds.r)
 ```
 
 ```{r deseqpairwise,include=FALSE,message=FALSE,echo=FALSE,warning=FALSE,asis=FALSE}

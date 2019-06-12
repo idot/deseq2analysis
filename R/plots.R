@@ -162,3 +162,56 @@ plotCountsPerGeneBoth <- function(dds.r){
     zero <- plotCountsPerGene(dds.r, 0) + xlab("normalised, no 0 counts")
     idoplots::grid_arrange_shared_legend(plus, zero)
 }
+
+#' gets data frame with dispersion estimates
+#'
+#'
+#' @export
+dispEstToDF <- function(dds.r){
+  px <- SummarizedExperiment::mcols(dds.r)$baseMean
+  sel <- (px > 0)
+  means <- px[sel]
+
+  #to make it comparable across reports same axis
+  dispEstXMin <- 1e-1
+  dispEstXMax <- 1e6
+  dispEstYMin <- 1e-5
+  dispEstYMax <- 1e2
+
+  toMinMax <- function(vs, vmin, vmax){
+    vs[vs > vmax] <- vmax*0.99
+    vs[vs < vmin] <- vmin*2
+    vs
+  }
+
+  py <- SummarizedExperiment::mcols(dds.r)$dispGeneEst[sel]
+  outlier <-SummarizedExperiment::mcols(dds.r)$dispOutlier[sel]
+  final <- DESeq2::dispersions(dds.r)[sel]
+  fitted <- SummarizedExperiment::mcols(dds.r)$dispFit[sel]
+  below <- 2*dispEstYMin ## arbitrary value for very low dispersion genes
+  belowT <- py < below
+  py[belowT] <- below
+  pointsDF <- data.frame(mean=toMinMax(means, dispEstXMin, dispEstXMax),gene=toMinMax(py,dispEstYMin,dispEstYMax),outlier=outlier,fitted=toMinMax(fitted,dispEstYMin,dispEstYMax),final=toMinMax(final,dispEstYMin,dispEstYMax))
+  pointsDF
+}
+
+#' plot the dispersion estimate
+#'
+#'
+#' @export
+plotDispEst <- function(dds){
+  #to make it comparable across reports same axis
+  dispEstXMin <- 1e-1
+  dispEstXMax <- 1e6
+  dispEstYMin <- 1e-5
+  dispEstYMax <- 1e2
+
+  dispDF <- dispEstToDF(dds)
+  p <- ggplot(dispDF, aes(x=mean,y=gene)) + geom_point(size=2,alpha=0.3,aes(colour="gene estimate")) + geom_point(size=2,alpha=0.3,aes(x=mean,y=final,colour="final")) + geom_point(size=1,aes(x=mean,y=fitted,colour="fitted")) + scale_x_log10(limits=c(dispEstXMin,dispEstXMax)) + scale_y_log10(limits=c(dispEstYMin,dispEstYMax)) + guides(colour=guide_legend("category")) + xlab("mean of normalized counts") + ylab("dispersion")
+  if(any(dispDF$outlier)){
+    p <- p + geom_point(data=subset(dispDF, outlier), alpha=0.4, size=3, aes(x=mean,y=gene,colour="outlier"))
+  }
+  p
+}
+
+
