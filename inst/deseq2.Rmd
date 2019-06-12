@@ -40,7 +40,7 @@ options(knitr.table.format = "html")
 ```
 
 ```{r import, include=FALSE, cache=FALSE}
-dataList <- deseq2analysis::prepareDataFromConfig(deseqconfig)
+dataList <- prepareDataFromConfig(deseqconfig)
 dds <- dataList$dds
 dds.r <- dataList$dds.r
 deseq.r <- dataList$deseq.r
