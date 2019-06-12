@@ -44,7 +44,6 @@ dataList <- prepareDataFromConfig(deseqconfig)
 dds <- dataList$dds
 dds.r <- dataList$dds.r
 deseq.r <- dataList$deseq.r
-rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
 ```
 
 # DESeq2 analysis: overview
@@ -86,6 +85,7 @@ rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
 
 
 ```{r allpca, fig.cap="PCA of 500 genes with highest variance across conditions, rLog normalised"}
+   rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
    DESeq2::plotPCA(rlogFull, intgroup = "group", ntop = 500)
 ```
 
