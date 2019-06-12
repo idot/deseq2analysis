@@ -138,3 +138,13 @@ getComparisons <- function(grouping){
    colnames(allcomparisons) <- c("cond1","cond2")
    tibble::as_tibble(allcomparisons)
 }
+
+
+#' read the comparisons table
+#'
+#' @param filepath path to comparisons table
+#'
+#' @export
+readComparisonsTable <- function(filepath){
+  readr::read_tsv(filepath)
+}

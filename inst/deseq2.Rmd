@@ -40,13 +40,10 @@ options(knitr.table.format = "html")
 ```
 
 ```{r import, include=FALSE, cache=FALSE}
-ensembl <- readEnsembl(deseqconfig$ensembltable)
-grouping <- readGrouping(deseqconfig$groupingtable) # todo: enable filter grouping in deseqconfig
-h2id <- deseqconfig$import$header2id
-dds <- readCountsToDeseq2(deseqconfig$countstable, grouping, header2id=get(h2id), remove_genes = NULL, metacols=deseqconfig$import$metacols, skip=deseqconfig$import$skip)
-dds.r <- DESeq2::DESeq(dds, betaPrior = TRUE)
-comparisons <- readr::read_tsv(deseqconfig$comparisonstable)
-deseq.r <- purrrlyr::by_row(comparisons, function(row){ deseqResult(dds.r, row$cond1, row$cond2) }) %>% dplyr::pull(.out)
+dataList <- deseq2analysis::prepareDataFromConfig(deseqconfig)
+dds <- dataList$dds
+dds.r <- dataList$dds.r
+deseq.r <- dataList$deseq.r
 rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
 ```
 
@@ -93,6 +90,10 @@ rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
 ```
 
 
+```{r dispest, fig.cap="Dispersion estimates"}
+   DESeq2::plotDispEsts(dds.r)
+```
+
 ```{r deseqpairwise,include=FALSE,message=FALSE,echo=FALSE,warning=FALSE,asis=FALSE}
    
    lfc <- deseqconfig$deseq2$log2fc
@@ -104,10 +105,10 @@ rlogFull <- DESeq2::rlog(dds.r, blind = TRUE)
 
             #comparison was added by me to metadata(deseq.result)
             comparisongroups <- S4Vectors::metadata(deseq.result)$comparison[2:3]
-            normcounts <- getCounts(dds.r, comparisongroups, grouping)
+            normcounts <- getCounts(dds.r, comparisongroups, dataList$grouping)
             filterThreshold <- getFilterThreshold(deseq.result)
 
-            comp <- toSortedTibble(deseq.result, ensembl, filterThreshold, normcounts)
+            comp <- toSortedTibble(deseq.result, dataList$ensembl, filterThreshold, normcounts)
             comparisonFoldchange <- getComparisonFoldChange(deseq.result)
             tit <- getComparison(deseq.result)
             titfile <- getComparisonString(deseq.result)
@@ -159,3 +160,6 @@ sorted by adjusted p-value and log2 fold change. The statistics columns of the t
 ```{r sessioninfo}
    sessioninfo::session_info()
 ```
+
+
+

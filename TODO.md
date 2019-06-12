@@ -15,7 +15,9 @@ for pairwise data
 
 general 
 ------- 
-* make gene.tab optional
+* make gene.tab (ensembl) optional
+* make groupings/comparisons more flexible
+
 
 
 

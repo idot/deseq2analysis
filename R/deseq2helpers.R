@@ -337,7 +337,7 @@ createGroupComparisons <- function(deseqconfig, deseq.r, dds.r, grouping, ensemb
                 testfunctionalFromConfig(comp, titfile, deseqconfig, tit)
             }
 
-            ADVENTUROUS <- FALSE
+            ADVENTUROUS <- TRUE
             if(ADVENTUROUS){
                 pairRmd <- knitLabels(titfile, KNITDIR)
             }else{
@@ -346,6 +346,30 @@ createGroupComparisons <- function(deseqconfig, deseq.r, dds.r, grouping, ensemb
             deseqout <- c(deseqout, knitr::knit_child(pairRmd, envir=globalenv(), options = list(echo = FALSE, warning = FALSE, results = 'hide')))
       }
       deseqout
+}
+
+#' extract the list of comparisons
+#'
+#'
+#' @export
+extractComparisonsList <- function(comparisons, dds.r){
+    purrrlyr::by_row(comparisons, function(row){ deseqResult(dds.r, row$cond1, row$cond2) }) %>% dplyr::pull(.out)
+}
+
+#' prepares a list of the data used by knitr
+#'
+#'
+#' @export
+prepareDataFromConfig <- function(deseqconfig){
+      ensembl <- readEnsembl(deseqconfig$ensembltable)
+      grouping <- readGrouping(deseqconfig$groupingtable)
+      h2id <- deseqconfig$import$header2id
+      dds <- readCountsToDeseq2(deseqconfig$countstable, grouping, header2id=get(h2id), remove_genes = NULL, metacols=deseqconfig$import$metacols, skip=deseqconfig$import$skip)
+      dds.r <- DESeq2::DESeq(dds, betaPrior = TRUE)
+      comparisons <- readComparisonsTable(deseqconfig$comparisonstable)
+      deseq.r <- extractComparisonsList(comparisons, dds.r)
+
+      list(ensembl=ensembl,grouping=grouping,dds=dds, dds.r=dds.r,deseq.r=deseq.r)
 }
 
 #' LOG to console in knitr
