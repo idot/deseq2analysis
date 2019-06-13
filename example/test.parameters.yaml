@@ -15,7 +15,7 @@ deseq2:
 
 # parameters for functional analysis (GO, GSEA, ...)
 # to disable rename functional to something else like Xfunctional
-xfunctional:
+functional:
    # organism
    organism: Hs
    # idtype
@@ -48,5 +48,7 @@ import:
    #how many lines to skip to header line of counts
    skip: 0
 
-
+debug:
+   # skip functional analysis and just take old rds in folder 
+   loadrds: TRUE 
 

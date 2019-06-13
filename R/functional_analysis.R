@@ -366,6 +366,14 @@ outTableFunctionalPath <- function(outtabledir, outbasefun, suffix){
     paste(outtabledir, "/", outbasefun, "_", suffix, "_functional_analysis.tab",sep="")
 }
 
+
+#' scientific format for HTML tables
+#'
+#' @export
+sfformat <- function(value){
+   formatC(value, "E", width=3, digits=2)
+}
+
 #' datatable for GO
 #' data comes in in long format, which is why distinct is necessary
 #'
@@ -378,7 +386,7 @@ datatabGO <- function(dat, suffix, outtabledir, outbasefun){
      tabvalstab <- dat %>% dplyr::ungroup() %>% dplyr::select(-dplyr::one_of(c("go.result.index", "go.link","go.gene.id")))  %>% dplyr::distinct()
      readr::write_tsv(tabvalstab, outTableFunctionalPath(outtabledir, outbasefun, suffix))
   }
-  tabvalshtml %>% DT::datatable(escape=FALSE) %>% DT::formatSignif(c('go.pval'), 3)
+  tabvalshtml %>% dplyr::mutate(pvalue=sfformat(go.pval)) %>% dplyr::select(-go.pval) %>% DT::datatable(escape=FALSE)
 }
 
 #' datatable for KEGG
@@ -390,7 +398,7 @@ datatabKEGG <- function(dat, suffix, outtabledir, outbasefun){
   if(! is.null(outtabledir) & ! is.null(outbasefun)){
      readr::write_tsv(dat, outTableFunctionalPath(outtabledir, outbasefun, suffix))
   }
-  DT::datatable(dat, escape=FALSE) %>% DT::formatSignif(c('Pvalue','ExpCount'), 3)
+  dat %>% dplyr::mutate(pvalue=sfformat(Pvalue), `expected count`=sfformat(ExpCount))  %>% dplyr::select(-c(Pvalue, ExpCount)) %>% DT::datatable(escape=FALSE)
 
 }
 
@@ -403,7 +411,7 @@ datatabReact <- function(dat, suffix, outtabledir, outbasefun){
   if(! is.null(outtabledir) & ! is.null(outbasefun)){
     readr::write_tsv(dat, outTableFunctionalPath(outtabledir, outbasefun, suffix))
   }
-  DT::datatable(dat, escape=FALSE)
+  dat %>% dplyr::mutate(p.adj=sfformat(p.adjust), qvalue=sfformat(qvalue), pvalue=sfformat(pvalue)) %>% dplyr::select(-p.adjust) %>% DT::datatable(escape=FALSE)
 }
 
 #' datatable for GSEA
@@ -419,7 +427,7 @@ datatabGSEA <- function(gsea, toppathways, suffix, outtabledir, outbasefun){
   if(! is.null(outtabledir) & ! is.null(outbasefun)){
     readr::write_tsv(dats, outTableFunctionalPath(outtabledir, outbasefun, suffix))
   }
-  DT::datatable(dats, escape=FALSE) %>% DT::formatSignif(c('padj'),3)
+  dat  %>% dplyr::mutate(p.adj=sfformat(padj))  %>% dplyr::select(-padj) %>% DT::datatable(escape=FALSE)
 }
 
 

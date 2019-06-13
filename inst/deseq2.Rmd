@@ -120,7 +120,13 @@ deseq.r <- dataList$deseq.r
             }
 
             if(!is.null(deseqconfig$functional)){
-                testfunctionalFromConfig(comp, titfile, deseqconfig, tit)
+                if(! is.null(deseqconfig$debug) && !is.null(deseqconfig$debug$loadrds) && deseqconfig$debug$loadrds ){ #check deseqconfig for loadrds: TRUE
+                    LOG("skipping functional analysis but creating plots from RDS")
+                }else{
+                    testfunctionalFromConfig(comp, titfile, deseqconfig, tit)
+                }
+            }else{
+              LOG(paste("skipping funcitonal analysis because of config"))
             }
 
             ADVENTUROUS <- TRUE ## this works better than FALSE where I don't find any output files after the 1. loop.
