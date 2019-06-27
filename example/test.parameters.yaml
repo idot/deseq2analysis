@@ -47,6 +47,8 @@ import:
    metacols: 6
    #how many lines to skip to header line of counts
    skip: 0
+   # id type to add annotation
+   idtype: ENSEMBL
 
 debug:
    # skip functional analysis and just take old rds in folder 

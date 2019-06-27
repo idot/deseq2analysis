@@ -58,23 +58,31 @@ deseqResult <- function(dds.r, condition1, condition2, condition="group"){
 #' @param filterThreshold the mean value cutoff from deseq2 analysis
 #'
 #' @export
-toSortedTibble <- function(deseq.result, ensembl, filterThreshold, countsdata=NULL){
+toSortedTibble <- function(deseq.result, annotation, filterThreshold, countsdata=NULL){
     comp.all <-  as.data.frame(deseq.result) %>%
     dplyr::mutate(geneid = rownames(deseq.result), absFC = abs(log2FoldChange), meanFilter=baseMean < filterThreshold, url=ensembl_url(geneid), link=to_link(url, geneid))
     if(! is.null(countsdata)){
       comp.all <- comp.all %>% dplyr::left_join(countsdata)
     }
-    comp.all <- comp.all %>%
-    dplyr::left_join(ensembl, by=c(geneid="geneid")) %>%
-    dplyr::arrange(padj, absFC) %>%
-    dplyr::select(-absFC) %>%
-    dplyr::select(geneid, dplyr::everything())
-    if(nrow(deseq.result) != nrow(comp.all)){
-      error <- paste("we lost some rows in toSortedTibble, should be left_join!: ", nrow(deseq.result), " -> ", nrow(comp.all))
-      stop(error)
+    if(! is.null(annotation)){
+        comp.all <- comp.all %>%
+        dplyr::left_join(annotation, by=c(geneid="geneid")) %>%
+        dplyr::arrange(padj, absFC) %>%
+        dplyr::select(-absFC) %>%
+        dplyr::select(geneid, dplyr::everything())
+        if(nrow(deseq.result) != nrow(comp.all)){
+          error <- paste("we lost some rows in toSortedTibble, should be left_join!: ", nrow(deseq.result), " -> ", nrow(comp.all))
+          stop(error)
+        }
+    }else{
+      comp.all <- comp.all %>%
+        dplyr::arrange(padj, absFC) %>%
+        dplyr::select(-absFC) %>%
+        dplyr::select(geneid, dplyr::everything())
     }
     comp.all
 }
+
 
 #' extracts the independent filtering threshold from deseq result
 #'
@@ -356,21 +364,8 @@ extractComparisonsList <- function(comparisons, dds.r){
     purrrlyr::by_row(comparisons, function(row){ deseqResult(dds.r, row$cond1, row$cond2) }) %>% dplyr::pull(.out)
 }
 
-#' prepares a list of the data used by knitr
-#'
-#'
-#' @export
-prepareDataFromConfig <- function(deseqconfig){
-      ensembl <- readEnsembl(deseqconfig$ensembltable)
-      grouping <- readGrouping(deseqconfig$groupingtable)
-      h2id <- deseqconfig$import$header2id
-      dds <- readCountsToDeseq2(deseqconfig$countstable, grouping, header2id=get(h2id), remove_genes = NULL, metacols=deseqconfig$import$metacols, skip=deseqconfig$import$skip)
-      dds.r <- DESeq2::DESeq(dds, betaPrior = TRUE)
-      comparisons <- readComparisonsTable(deseqconfig$comparisonstable)
-      deseq.r <- extractComparisonsList(comparisons, dds.r)
 
-      list(ensembl=ensembl,grouping=grouping,dds=dds, dds.r=dds.r,deseq.r=deseq.r)
-}
+
 
 #' LOG to console in knitr
 #'

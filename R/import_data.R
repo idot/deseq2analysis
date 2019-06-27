@@ -88,6 +88,9 @@ readCounts <- function(countpath, header2id=vbcf_bamname2id, remove_genes=NULL, 
 #'
 #' @export
 readGrouping <- function(groupingpath){
+  if(!file.exists(groupingpath)){
+    stop(paste("path to grouping file", groupingpath, "not found"))
+  }
   orig <- readr::read_tsv(groupingpath) %>% dplyr::mutate(sampleId=as.character(sampleId))
   grouping <- orig %>%
           dplyr::mutate(sampleId=as.character(sampleId)) %>%
@@ -110,19 +113,20 @@ readGrouping <- function(groupingpath){
 deseqDataFromMatrix <- function(countsMatrix, grouping){
   countsMatrixS <- countsMatrix[,colnames(countsMatrix) %in% grouping[,1]]
   checkCountColumnsDesignSamples(countsMatrixS, grouping)
+  LOG(paste("count of count columns:", ncol(countsMatrixS), "count of groups:", nrow(grouping)))
   dds <- DESeq2::DESeqDataSetFromMatrix(countData = countsMatrixS,
                                 colData = grouping,
                                 design = ~ group)
   dds
 }
 
-#' checks that count matrix and grouing table have same sample order
+#' checks that count matrix and grouping table have same sample order
 #' grouping table must have sampleid in first column
 #'
 #' @export
 checkCountColumnsDesignSamples <- function(countsMatrix, grouping){
   if(! all(colnames(countsMatrix) == grouping[,1])){
-    err <- paste("problem with column order in count data and metadata\n", "   [" , paste(metadf[,1],collapse=", "), "]\n",  "   [", paste(countcolumns, collapse=","), "]\n", collapse=" ")
+    err <- paste("problem with column order in count data and metadata\n", "   [" , paste(grouping[,1],collapse=", "), "]\n",  "   [", paste(colnames(countsMatrix), collapse=","), "]\n", collapse=" ")
     stop(err)
   }
   TRUE
@@ -147,4 +151,63 @@ getComparisons <- function(grouping){
 #' @export
 readComparisonsTable <- function(filepath){
   readr::read_tsv(filepath)
+}
+
+
+#' prepares a list of the data used by knitr
+#'
+#' @param deseqconfig
+#'
+#' @export
+prepareDataFromConfig <- function(deseqconfig){
+  grouping <- readGrouping(deseqconfig$groupingtable)
+  h2id <- deseqconfig$import$header2id
+  dds <- readCountsToDeseq2(deseqconfig$countstable, grouping, header2id=get(h2id), remove_genes = NULL, metacols=deseqconfig$import$metacols, skip=deseqconfig$import$skip)
+  dds.r <- DESeq2::DESeq(dds, betaPrior = TRUE)
+  comparisons <- readComparisonsTable(deseqconfig$comparisonstable)
+  deseq.r <- extractComparisonsList(comparisons, dds.r)
+  annotation <- getAnnotationFromConfig(rownames(dds), deseqconfig)
+  list(annotation=annotation,grouping=grouping,dds=dds, dds.r=dds.r,deseq.r=deseq.r)
+}
+
+
+
+#' creates annotation tibble from idvector
+#'
+#'
+#' @export
+getAnnotationFromIds <- function(ids, organism, idtype){
+  annotationmap <- speciesIDTypeToLib(organism, idtype)$lib
+  if(is.null(annotationmap)){
+    stop(paste("could not find annotation map with ", organism, idtype))
+  }
+  library(annotationmap, character.only = TRUE)
+  lib <- get(annotationmap)
+  annot <- AnnotationDbi::select(lib, keys=ids, columns=c("GENENAME","SYMBOL"), keytype=idtype)
+  if(nrow(annot) == 0){
+    stop(paste("could not convert any ", organism, idtype))
+  }
+  annot %>%
+    dplyr::group_by_(idtype) %>%
+    dplyr::summarize(symbol=SYMBOL[1],symbolConcat=paste(unique(SYMBOL),sep=",",collapse=""),symbolCount=length(unique(SYMBOL)),
+                     genename=GENENAME[1],genenameConcat=paste(unique(GENENAME),sep=","),genenameCount=length(unique(GENENAME))) %>%
+    dplyr::rename(geneid=idtype)
+}
+
+
+#' gets the annotation
+#'
+#' @param ids vector of ids
+#' @param deseqconfig
+#'
+#'
+#' @export
+getAnnotationFromConfig <- function(ids, deseqconfig){
+  if(! is.null(deseqconfig$ensembltable)){
+    readEnsembl(deseqconfig$ensembltable)
+  } else if(!is.null(deseqconfig$import$idtype) && !is.null(deseqconfig$import$organism)){
+    getAnnotationFromIds(ids, deseqconfig$import$organism, deseqconfig$import$idtype)
+  } else {
+    NULL
+  }
 }

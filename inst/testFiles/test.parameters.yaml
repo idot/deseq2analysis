@@ -1,10 +1,10 @@
 analysis_title: Differential Expression Test
 outputname: Test.deseq.html
 
-countstable: test.counts.tab
-groupingtable: test.grouping.tab
-ensembltable: test.ensembl.GRCh38.genes.tab
-comparisonstable: test.comparisons.tab
+countstable: inst/testFiles/test.counts.tab
+groupingtable: inst/testFiles/test.grouping.tab
+ensembltable: inst/testFiles/test.ensembl.GRCh38.genes.tab
+comparisonstable: inst/testFiles/test.comparisons.tab
 
 # parameters for DESeq2
 deseq2:
@@ -39,7 +39,7 @@ import:
    #how many metadata columns are left of the count columns
    metacols: 6
    #how many lines to skip to header line of counts
-   skip: 0
+   skip: 1 
 
 
 

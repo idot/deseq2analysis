@@ -79,6 +79,20 @@ test_that("we can get all the comparisons from a grouping as a two column tibble
   expect_equal(2, ncol(comparisons))
 })
 
+test_that("we can get annotation from ids when given species and idtype", {
+  ids <- c("FBgn0000017","FBgn0000057", "FBgn0034350")
+  annotations <- getAnnotationFromIds(ids, "Dm", "FLYBASE")
+  expect_equal(3, nrow(annotations))
+  expect_equal(ids, annotations$geneid)
+})
+
+# does not work with paths in test()
+#test_that("we can prepare the input data from the config", {
+#   deseqconfig <- yaml::read_yaml(filesPath("test.parameters.yaml"))
+#   data <- prepareDataFromConfig(deseqconfig)
+#   expect_equal(8, ncol(data$annotation))
+#})
+
 ### to create test data
 createTestData <- function(){
   filesPath <- function(f){ paste("inst/testFiles/", f, sep="") }
