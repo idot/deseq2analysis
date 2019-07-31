@@ -108,7 +108,7 @@ deseq.r <- dataList$deseq.r
             normcounts <- getCounts(dds.r, comparisongroups, dataList$grouping)
             filterThreshold <- getFilterThreshold(deseq.result)
 
-            comp <- toSortedTibble(deseq.result, dataList$ensembl, filterThreshold, normcounts)
+            comp <- toSortedTibble(deseq.result, dataList$annotation, filterThreshold, normcounts)
             comparisonFoldchange <- getComparisonFoldChange(deseq.result)
             tit <- getComparison(deseq.result)
             titfile <- getComparisonString(deseq.result)
