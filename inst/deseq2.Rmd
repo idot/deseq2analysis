@@ -53,6 +53,13 @@ deseq.r <- dataList$deseq.r
 
 ```{r outputfiles}
    outputFilesTable(deseqconfig, deseq.r) %>%  knitr::kable(caption="output files") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"), latex_options = "striped")
+   norm <-  BiocGenerics::counts(dds.r, normalized=TRUE)
+   namet <- tibble::tibble(id=rownames(norm))
+   print(dim(namet))
+   normt <- tibble::as_tibble(norm)
+   print(dim(normt))
+   dfnorm <- cbind(namet,normt)
+   readr::write_tsv(dfnorm, "all.counts.normalised.tab")
 ```
 
 
