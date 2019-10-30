@@ -180,9 +180,9 @@ prepareDataFromConfig <- function(deseqconfig){
 #'
 #' @export
 getAnnotationFromIds <- function(ids, organism, idtype){
-  annotationmap <- speciesIDTypeToLib(organism, idtype)$lib
+  annotationmap <- speciesIDTypeToLib(organism)$lib
   if(is.null(annotationmap)){
-    stop(paste("could not find annotation map with ", organism, idtype))
+    stop(paste("could not find annotation map with ", organism))
   }
   library(annotationmap, character.only = TRUE)
   lib <- get(annotationmap)

@@ -33,32 +33,21 @@ species2map <- function(speciesName, mapdb){
 #' map of species to various database and species identifiers
 #'
 #' @param speciesName short name of species Mm Hs At Dm ..
-#' @param idtype one of valid IDs eg. ENSEMBL ...
 #'
-#' can return rows with duplicated geneids if multiple entrez for this gene id
-#' can return NAs in entrez
-#' can return rows with duplicated entrez if multiple geneids for entrez
+#' default: "org.speciesName.eg.db"
 #'
 #' @export
-speciesIDTypeToLib <- function(speciesName, idtype){
+speciesIDTypeToLib <- function(speciesName){
   abase <- species2map(speciesName, "abase")
   clusterprof <- species2map(speciesName, "clusterprofiler")
   msigdbr <- species2map(speciesName, "msigdbr")
-  if(! is.na(abase) & toupper(idtype) %in% validIDtypes){
+  if(is.na(abase)){
+    lib <- paste("org.", speciesName, ".eg.db",sep="")
+  }else{
     lib <- paste(abase,".db",sep="")
-    map <- paste(abase,idtype,"2EG",sep="")
-    gene <- paste(abase,"GENENAME", sep="")
-    refseq <- paste(abase,"REFSEQ", sep="")
-    egGO <- paste(abase, "GO", sep="")
-    list(lib=lib,map=map,gene=gene,refseq=refseq,egGO=egGO,clusterprofiler=clusterprof,msigdbr=msigdbr)
-  } else {
-    NULL
   }
+  list(lib=lib,clusterprofiler=clusterprof,msigdbr=msigdbr)
 }
-
-##
-validIDtypes <- c("ENSEMBL", "ENSEMBLTRANS", "REFSEQ", "GENENAME", "SYMBOL", "UNIGENE", "FLYBASE", "MGI")
-
 
 
 #' adds entrez id column to table based on geneid
@@ -250,7 +239,7 @@ testfunctionalFromConfig <- function(resultTable, outbasefun, deseqconfig, compa
 #'
 #' @export
 testFunctional <- function(resultTable, organism, idtype, outbasefun, pvalExp, log2FCExp, pvalGo){
-  libMap <- speciesIDTypeToLib(organism, idtype)
+  libMap <- speciesIDTypeToLib(organism)
   libMapStr <- paste(libMap, collapse=" ", paste="")
   #LOG(paste("species annotation map: ", libMapStr))
 
