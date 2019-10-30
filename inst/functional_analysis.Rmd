@@ -56,7 +56,16 @@ if(file.exists(deseq2parameterfile)){
 goup <- readRDS(paste(outbasefun,"_up.RDS",sep=""))
 godn <- readRDS(paste(outbasefun,"_dn.RDS",sep=""))
 gode <- readRDS(paste(outbasefun,"_de.RDS",sep=""))
-gseaL <- readRDS(paste(outbasefun,"_gse.RDS",sep=""))
+
+showKegg <- !is.null(goup$kegg)
+showReactome <- !is.null(goup$react)
+
+GSEA_PATH <- paste(outbasefun,"_gse.RDS",sep="")
+showGSEA <- file.exists(GSEA_PATH) 
+gseaL <- NULL
+if(showGSEA){
+  gseaL <- readRDS(showGSEA)
+}
 
 
 ```
@@ -75,27 +84,27 @@ The GeneOntology analysis test for overrepresentation of groups of genes within 
 
 ### GO biological process
 ```{r, echo = FALSE}
-   emptyTable(goup$mf, datatabGO, "UpGoBp", outtabledir, outbasefun)
+   emptyTable(goup$bp, datatabGO, "UpGoBp", outtabledir, outbasefun)
 ```
 
 ### GO cellular component
 ```{r, echo = FALSE}
-   emptyTable(goup$mf, datatabGO, "UpGoCc", outtabledir, outbasefun)
+   emptyTable(goup$cc, datatabGO, "UpGoCc", outtabledir, outbasefun)
 ```
 
 ## KEGG
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=showKegg, include=showKegg}
    emptyTable(goup$kegg, datatabKEGG, "UpKEGG", outtabledir, outbasefun)
 ```
 
 ## Reactome
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=showReactome, include=showReactome}
    emptyTable(as.data.frame(goup$react), datatabReact, "UpReact", outtabledir, outbasefun)
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=showReactome, include=showReactome}
    plotEmpty(goup$react,  enrichplot::dotplot(goup$react, showCategory=15))
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=showReactome, include=showReactome}
    plotEmpty(goup$react,  enrichplot::emapplot(goup$react))
 ```
 
@@ -119,18 +128,18 @@ The GeneOntology analysis test for overrepresentation of groups of genes within 
 ```
 
 ## KEGG
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=showKegg, include=showKegg}
    emptyTable(godn$kegg, datatabKEGG, "DnKEGG", outtabledir, outbasefun)
 ```
 
 ## Reactome
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=showReactome, include=showReactome}
    datatabReact(as.data.frame(godn$react), "DnReact", outtabledir, outbasefun)
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=showReactome, include=showReactome}
    plotEmpty(godn$react,  enrichplot::dotplot(godn$react, showCategory=15))
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=showReactome, include=showReactome}
    plotEmpty(godn$react,  enrichplot::emapplot(godn$react))
 ```
 
@@ -154,18 +163,18 @@ The GeneOntology analysis test for overrepresentation of groups of genes within 
 ```
 
 ## KEGG
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=showKegg, include=showKegg}
    emptyTable(gode$kegg, datatabKEGG, "DrKEGG", outtabledir, outbasefun)
 ```
 
 ## Reactome
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=showReactome, include=showReactome}
    emptyTable(as.data.frame(gode$react), datatabReact, "DrReact", outtabledir, outbasefun)
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=showReactome, include=showReactome}
    plotEmpty(gode$react,  enrichplot::dotplot(gode$react, showCategory=15))
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=showReactome, include=showReactome}
    plotEmpty(gode$react,  enrichplot::emapplot(gode$react))
 ```
 
@@ -178,11 +187,11 @@ gene sets the top 10 up and downregulated pathways are shown.
 
 Hallmark gene sets  are coherently expressed signatures derived by aggregating many MSigDB gene sets to represent well-defined biological states or processes.
 
-```{r,fig.cap="Hallmark gene sets", echo=FALSE, warnings=FALSE}
+```{r,fig.cap="Hallmark gene sets", echo=FALSE, warnings=FALSE, eval=showGSEA, include=showGSEA}
    topPathways <- extractGSEAOverviewCollapsedTop(gseaL, 10, "H", gseaL$pvalGo) 
    fgsea::plotGseaTable(gseaL$pathways[topPathways], gseaL$stats, gseaL$gsea, gseaParam = 0.5)
 ```
-```{r, echo=FALSE, warnings=FALSE}
+```{r, echo=FALSE, warnings=FALSE, eval=showGSEA, include=showGSEA}
    datatabGSEA(gseaL$gsea, topPathways, "GSEAH", outtabledir, outbasefun)       
 ```
 
@@ -190,36 +199,36 @@ Hallmark gene sets  are coherently expressed signatures derived by aggregating m
 ## Curated gene sets
 Curated gene sets from online pathway databases, publications in PubMed, and knowledge of domain experts.
 
-```{r,fig.cap="Curated gene sets", echo=FALSE, warnings=FALSE}
+```{r,fig.cap="Curated gene sets", echo=FALSE, warnings=FALSE, eval=showGSEA, include=showGSEA}
    topPathways <- extractGSEAOverviewCollapsedTop(gseaL, 10, gseaL$pvalGo, "C2")
    fgsea::plotGseaTable(gseaL$pathways[topPathways], gseaL$stats, gseaL$gsea, gseaParam = 0.5)
 ```
 
-```{r, echo=FALSE, warnings=FALSE}
+```{r, echo=FALSE, warnings=FALSE, eval=showGSEA, include=showGSEA}
    datatabGSEA(gseaL$gsea, topPathways, "GSEAC2", outtabledir, outbasefun)
 ```
 
 ## Go gene sets
 GO gene sets  consist of genes annotated by the same GO terms.
 
-```{r,fig.cap="GO gene sets", echo=FALSE, warnings=FALSE}
+```{r,fig.cap="GO gene sets", echo=FALSE, warnings=FALSE, eval=showGSEA, include=showGSEA}
    topPathways <- extractGSEAOverviewCollapsedTop(gseaL, 10, gseaL$pvalGo, "C5")
    fgsea::plotGseaTable(gseaL$pathways[topPathways], gseaL$stats, gseaL$gsea, gseaParam = 0.5)
 ```
 
-```{r, echo=FALSE, warnings=FALSE}
+```{r, echo=FALSE, warnings=FALSE, eval=showGSEA, include=showGSEA}
    datatabGSEA(gseaL$gsea, topPathways, "GSEAC5", outtabledir, outbasefun)
 ```
 
 ## Motif gene sets
 Motif gene sets based on conserved cis-regulatory motifs from a comparative analysis of the human, mouse, rat, and dog genomes.
 
-```{r,fig.cap="Motif gene sets", echo=FALSE, warnings=FALSE}
+```{r,fig.cap="Motif gene sets", echo=FALSE, warnings=FALSE, eval=showGSEA, include=showGSEA}
    topPathways <- extractGSEAOverviewCollapsedTop(gseaL, 10, gseaL$pvalGo, "C3")
    fgsea::plotGseaTable(gseaL$pathways[topPathways], gseaL$stats, gseaL$gsea, gseaParam = 0.5)
 ```
 
-```{r, echo=FALSE, warnings=FALSE}
+```{r, echo=FALSE, warnings=FALSE, eval=showGSEA, include=showGSEA}
    datatabGSEA(gseaL$gsea, topPathways, "GSEAC3", outtabledir, outbasefun)
 ```
 

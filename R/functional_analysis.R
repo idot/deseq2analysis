@@ -155,14 +155,21 @@ testReactome <- function(signifTable, organism, pvalGo){
 #'
 #' @export
 testFunctionalEnrich <- function(signifTable, entrezUniverse, libMap, organism, pvalGo, regtype, outname){
+  LOG(paste("organism", organism, pvalGo, outname))
 
   mf <- testGO(signifTable, entrezUniverse, "MF", libMap, pvalGo)
   bp <- testGO(signifTable, entrezUniverse, "BP", libMap, pvalGo)
   cc <- testGO(signifTable, entrezUniverse, "CC", libMap, pvalGo)
 
-  kegg <- testKEGG(signifTable, entrezUniverse, libMap, pvalGo)
-  react <- testReactome(signifTable, organism, pvalGo)
-
+  kegg <- NULL
+  react <- NULL
+  #TODO: detect PATH in keytypes and react ..
+  if(FALSE){ # keytypes(libMap$lib) contains PATH ...){
+      kegg <- testKEGG(signifTable, entrezUniverse, libMap, pvalGo)
+  }
+  if(FALSE){#! is.null(organism)){
+    react <- testReactome(signifTable, organism, pvalGo)
+  }
   li <- list(regtype=regtype,mf=mf,bp=bp,cc=cc,kegg=kegg,react=react)
   saveRDS(li, paste(outname,".RDS",sep=""))
   invisible(li)
@@ -257,9 +264,10 @@ testFunctional <- function(resultTable, organism, idtype, outbasefun, pvalExp, l
   testFunctionalEnrich(signifdn, entrezUniverse, libMap, libMap$clusterprofiler, pvalGo, "downregulated", paste(outbasefun,"_dn",sep=""))
   testFunctionalEnrich(signifde, entrezUniverse, libMap, libMap$clusterprofiler, pvalGo, "deregulated", paste(outbasefun,"_de",sep=""))
 
-  #LOG("after signif filter")
-
-  testGSEA(resultEntrez, libMap$msigdbr, pvalGo, paste(outbasefun,"_gse.RDS",sep=""))
+  #LOG("after signif filter"
+  if(FALSE){ #! is.null(libMap$msigdbr)){
+    testGSEA(resultEntrez, libMap$msigdbr, pvalGo, paste(outbasefun,"_gse.RDS",sep=""))
+  }
 
 }
 
