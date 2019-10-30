@@ -114,8 +114,11 @@ deseq.r <- dataList$deseq.r
             comparisongroups <- S4Vectors::metadata(deseq.result)$comparison[2:3]
             normcounts <- getCounts(dds.r, comparisongroups, dataList$grouping)
             filterThreshold <- getFilterThreshold(deseq.result)
-
-            comp <- toSortedTibble(deseq.result, dataList$annotation, filterThreshold, normcounts)
+            urlfun <- deseqconfig$output$urlfunction
+            if(! is.null(urlfun)){
+              urlfun <- get(urlfun)
+            }
+            comp <- toSortedTibble(deseq.result, dataList$annotation, filterThreshold, urlfun, normcounts)
             comparisonFoldchange <- getComparisonFoldChange(deseq.result)
             tit <- getComparison(deseq.result)
             titfile <- getComparisonString(deseq.result)

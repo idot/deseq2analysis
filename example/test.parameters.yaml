@@ -39,6 +39,8 @@ output:
    normcount: TRUE
    # create one zip file
    zipall: TRUE
+   # function to create links in output table ensembl_url ncbi_url
+   urlfunction: ensembl_url
 
 import:
    #how to convert count column header to id eg. keep, digit5id, vbcf_bamname2id
@@ -51,6 +53,6 @@ import:
    idtype: ENSEMBL
 
 debug:
-   # skip functional analysis and just take old rds in folder 
-   loadrds: TRUE 
+   # skip functional analysis and just take old rds in folder
+   loadrds: TRUE
 

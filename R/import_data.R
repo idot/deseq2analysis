@@ -21,15 +21,15 @@ readCountsToDeseq2 <- function(countpath, grouping, header2id=vbcf_bamname2id, r
 #' @param column names to convert the ids from
 #' @export
 vbcf_bamname2id <- function(cols){
-  stringr::str_extract(pattern="\\d{5}", string=cols)
+  stringr::str_extract(pattern="\\d{5,6}", string=cols)
 }
 
-#' 5 digits as id
+#' 5 or 6 digits as id
 #'
 #' @param column names to convert the ids from
 #' @export
 digit5id <- function(cols){
-  stringr::str_extract(pattern="\\d{5}", string=cols)
+  stringr::str_extract(pattern="\\d{5,6}", string=cols)
 }
 
 #' keep column header as is
@@ -77,6 +77,7 @@ readCounts <- function(countpath, header2id=vbcf_bamname2id, remove_genes=NULL, 
   colnames(countsfc) <- header2id(colnames(countsfc))
   countsm <- as.matrix(countsfc)
   rownames(countsm) <- geneids
+  LOG(paste("transformed colnames of counttable:",  paste(colnames(countsm), collapse=" "), sep=" ", collapse=" "))
   countsm
 }
 
@@ -111,6 +112,8 @@ readGrouping <- function(groupingpath){
 #'
 #' @export
 deseqDataFromMatrix <- function(countsMatrix, grouping){
+  LOG(paste("grouping samples:", paste(grouping[,1], collapse=" "), sep=" ",collapse=" "))
+  LOG(paste("couttable samples:", paste(colnames(countsMatrix), collapse=" "), sep=" "))
   countsMatrixS <- countsMatrix[,colnames(countsMatrix) %in% grouping[,1]]
   checkCountColumnsDesignSamples(countsMatrixS, grouping)
   LOG(paste("count of count columns:", ncol(countsMatrixS), "count of groups:", nrow(grouping)))

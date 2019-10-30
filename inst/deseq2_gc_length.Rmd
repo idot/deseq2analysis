@@ -1,10 +1,10 @@
 
 ```{r, include=FALSE}
 
-comp <- toSortedTibble(deseq.result, ensembl) 
+filterThreshold <- getFilterThreshold(deseq.result)
+comp <- toSortedTibble(deseq.result, ensembl, filterThreshold) 
 comparisonFoldchange <- getComparisonFoldChange(deseq.result)
 tit <- getComparisonTitle(deseq.result)
-filterThreshold <- getFilterThreshold(deseq.result)
 if(SAVESIGNIF){
   saveTables(comp, getComparisonString(deseq.result))
 }

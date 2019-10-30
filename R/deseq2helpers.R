@@ -56,11 +56,15 @@ deseqResult <- function(dds.r, condition1, condition2, condition="group"){
 #' @param ensembl annotation
 #' @param countsdata the normalised expression values counts(dds.r, normalized=TRUE)
 #' @param filterThreshold the mean value cutoff from deseq2 analysis
+#' @param urlfun function to create links e.g. ensembl_url, ncbi_url, can be NULL
 #'
 #' @export
-toSortedTibble <- function(deseq.result, annotation, filterThreshold, countsdata=NULL){
+toSortedTibble <- function(deseq.result, annotation, filterThreshold, urlfun=NULL, countsdata=NULL){
     comp.all <-  as.data.frame(deseq.result) %>%
-    dplyr::mutate(geneid = rownames(deseq.result), absFC = abs(log2FoldChange), meanFilter=baseMean < filterThreshold, url=ensembl_url(geneid), link=to_link(url, geneid))
+    dplyr::mutate(geneid = rownames(deseq.result), absFC = abs(log2FoldChange), meanFilter=baseMean < filterThreshold)
+    if(! is.null(urlfun)){
+      comp.all <- comp.all %>% dplyr::mutate(url=urlfun(geneid), link=to_link(url, geneid))
+    }
     if(! is.null(countsdata)){
       comp.all <- comp.all %>% dplyr::left_join(countsdata)
     }
@@ -161,12 +165,12 @@ saveTables <- function(comp.all, pathbase){
   writexl::write_xlsx(comp.all, paste(pathbase, ".diff.norm.xlsx",sep=""))
 }
 
-#' create an enseble url
+#' create an ensemble url
 #' @param create a url to ensembl gene id
 #'
 #' @export
 ensembl_url <- function(ensemblid){
-  sprintf("http://www.ensembl.org/id/%s",ensemblid)
+  sprintf("https://www.ensembl.org/id/%s",ensemblid)
 }
 
 #' create a link
@@ -176,6 +180,14 @@ ensembl_url <- function(ensemblid){
 #' @export
 to_link <- function(url, txt){
   paste('<a href="', url, '">', txt, '</a>', sep="")
+}
+
+#' create an ncbi gene link url
+#' @param create a url to ncbi gene id
+#'
+#' @export
+ncbi_url <- function(ncbi_gene_id){
+  sprintf("https://www.ncbi.nlm.nih.gov/gene/?term=%s", ncbi_gene_id)
 }
 
 #' extract row indices of significanlty deregulated genes
@@ -316,6 +328,9 @@ zipall <- function(deseqconfig, knitdir){
 
 #' process group comparisons in loop
 #'
+#' its identical to the portion in deseq2.Rmd
+#' it might not have worked as a function ... must check
+#'
 #' @param deseqconfig the deseq config
 #' @param deseq.r the list with all comparisons
 #' @param dds.r the normalised values experimentset
@@ -331,19 +346,31 @@ createGroupComparisons <- function(deseqconfig, deseq.r, dds.r, grouping, ensemb
             comparisongroups <- S4Vectors::metadata(deseq.result)$comparison[2:3]
             normcounts <- getCounts(dds.r, comparisongroups, grouping)
             filterThreshold <- getFilterThreshold(deseq.result)
-
-            comp <- toSortedTibble(deseq.result, ensembl, filterThreshold, normcounts)
+            urlfun <- deseqconfig$output$urlfunction
+            if(! is.null(urlfun)){
+              urlfun <- get(urlfun)
+            }
+            comp <- toSortedTibble(deseq.result, ensembl, filterThreshold, urlfun, normcounts)
             comparisonFoldchange <- getComparisonFoldChange(deseq.result)
             tit <- getComparison(deseq.result)
             titfile <- getComparisonString(deseq.result)
+
+            LOG(paste("creating files for: ", tit, titfile, deseqconfig$output$savetables ))
 
             if(deseqconfig$output$savetables){
                 saveTables(comp, titfile)
             }
 
             if(!is.null(deseqconfig$functional)){
+              if(! is.null(deseqconfig$debug) && !is.null(deseqconfig$debug$loadrds) && deseqconfig$debug$loadrds ){ #check deseqconfig for loadrds: TRUE
+                LOG("skipping functional analysis but creating plots from RDS")
+              }else{
                 testfunctionalFromConfig(comp, titfile, deseqconfig, tit)
+              }
+            }else{
+              LOG(paste("skipping funcitonal analysis because of config"))
             }
+
 
             ADVENTUROUS <- TRUE
             if(ADVENTUROUS){
