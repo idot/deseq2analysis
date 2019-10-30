@@ -49,8 +49,10 @@ import:
    metacols: 6
    #how many lines to skip to header line of counts
    skip: 0
-   # id type to add annotation
+   # id type to add annotation (if additional ids wanted), bioconductor
    idtype: ENSEMBL
+   # organism in bioconductor package notation: Dm, Hs, Mm, Sc ... (if additional ids wanted)
+   organism: Hs
 
 debug:
    # skip functional analysis and just take old rds in folder
