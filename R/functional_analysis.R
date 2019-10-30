@@ -113,15 +113,23 @@ getGSEACollapsedPathways <- function(gseaL, pvalGo){
 #' @export
 testGO <- function(signifTable, entrezUniverse, ontology, libMap, pvalGo){
   signifEntrez <- signifTable$entrez
-  params <- new("GOHyperGParams", geneIds=signifEntrez, universeGeneIds=entrezUniverse, annotation=libMap$lib,
-                ontology=ontology, pvalueCutoff=pvalGo, conditional=TRUE, testDirection="over")
+  if(length(signifEntrez) > 0){
+    tryCatch(
+      {
+        params <- new("GOHyperGParams", geneIds=signifEntrez, universeGeneIds=entrezUniverse, annotation=libMap$lib,
+                      ontology=ontology, pvalueCutoff=pvalGo, conditional=TRUE, testDirection="over")
 
-  hgOver <- hyperGTest(params)
-  extractLong <- extract(hgOver, pvalGo, signifTable)
-  if(!is.na(extractLong)){
-    extractLong %>% dplyr::mutate(ontology=ontology)
-  }else{
-    NA
+        hgOver <- hyperGTest(params)
+        extractLong <- extract(hgOver, pvalGo, signifTable)
+        if(!is.na(extractLong)){
+          extractLong %>% dplyr::mutate(ontology=ontology)
+        } else {
+          NA
+        }
+      }, error = function(err){ LOG(paste("ERROR but continuing",err)); NA }
+    )
+  } else {
+      NA
   }
 }
 
